@@ -1,0 +1,30 @@
+{
+  "app": {
+    "title": "OpportunityAbroad",
+    "tagline": "AI-Powered Global Scholarships & Internships",
+    "phase_badge": "Phase 0: Foundations Active",
+    "description": "Connecting ambitious students worldwide with fully-funded and verified academic opportunities abroad.",
+    "roles": {
+      "student": "Student Portal",
+      "admin": "Admin Dashboard"
+    },
+    "features": {
+      "hybrid_search": "AI Hybrid Semantic & Full-Text Search",
+      "verified_ops": "Strictly Verified & Non-Hallucinated Listings",
+      "deadline_tracking": "Automated Multi-stage Deadline Alerts",
+      "privacy_first": "Privacy-First & Minimum PII Architecture"
+    },
+    "system_status": {
+      "title": "System Status",
+      "api": "FastAPI Backend: Online",
+      "db": "PostgreSQL 16 + pgvector: Ready",
+      "redis": "Redis 7 Cache: Connected",
+      "worker": "Background Ingestion Worker: Standby"
+    },
+    "actions": {
+      "explore": "Explore Opportunities (Coming in Phase 2)",
+      "docs": "Architecture Blueprint"
+    }
+  }
+}
+
