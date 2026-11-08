@@ -1,7 +1,7 @@
 # Project Phases: OpportunityAbroad
 
 ## Phase 0: Foundations
-- **Status**: todo
+- **Status**: done
 - **Goal**: Set up monorepo (`apps/web`, `apps/api`, `packages/shared`), docker-compose with pgvector Postgres 16, Redis 7, Mailpit, api, worker placeholder, and web; configure Alembic; implement `/api/v1/health` returning db and redis status; set up linting, type-checking, test tooling, pre-commit configuration, and GitHub Actions running lint and tests.
 - **Acceptance Criteria**: `docker compose up` works, health endpoint returns 200 with DB and Redis checks, web shows a placeholder page, and CI commands pass locally.
 
