@@ -38,3 +38,25 @@
 - **Why**: 
   - Enables clean separation of concerns while keeping schemas synchronized across client and server.
 
+## ADR-006: Refresh Token Storage and Hash Strategy
+- **Date**: 2026-11-08
+- **Decision**: Persist only the SHA-256 cryptographic hash of refresh tokens in the `refresh_tokens` table. Pass raw high-entropy tokens only via `httpOnly` cookies. Group rotated tokens by `family_id` to allow instant complete family revocation when token reuse is detected.
+- **Why**: 
+  - If the database is compromised, active refresh tokens cannot be stolen or used to forge sessions.
+  - Family-based revocation ensures that race-condition or stolen-token replays invalidate all attacker sessions immediately.
+
+
+
+## ADR-007: Frontend Auth Architecture
+- **Date**: 2026-11-08
+- **Decision**: Consolidate all auth state and methods in a single `AuthContext.tsx` file (context + provider + `useAuth` hook). Store the JWT access token in a module-scoped variable in `api.ts` (never localStorage/sessionStorage). Use a single-flight mutex for refresh to avoid duplicate requests. All pages import `useAuth` from `context/AuthContext`.
+- **Why**:
+  - In-memory token storage prevents XSS-based token theft.
+  - Single-flight mutex prevents refresh token race conditions.
+  - Consolidated context file avoids import confusion and circular dependencies.
+  - Auto-refresh on 401 in `fetchWithAuth` provides seamless session continuity.
+
+## ADR-008: Python Version Constraint
+- **Date**: 2026-11-08
+- **Decision**: Use Python 3.13 (not 3.14) for the backend virtual environment.
+- **Why**: pydantic-core requires Rust compilation via maturin, which fails on Python 3.14. Python 3.13 is the latest stable version with full binary wheel support for all dependencies.

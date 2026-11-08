@@ -3,11 +3,12 @@ from unittest.mock import AsyncMock
 import pytest
 from httpx import AsyncClient
 
+from app.db.session import get_db
+from app.main import app
+
 
 @pytest.mark.asyncio
-async def test_health_check_ok(
-    client: AsyncClient, mock_db_session: AsyncMock, mock_redis: AsyncMock
-) -> None:
+async def test_health_check_ok(client: AsyncClient) -> None:
     response = await client.get("/api/v1/health")
     assert response.status_code == 200
     data = response.json()
@@ -21,11 +22,19 @@ async def test_health_check_ok(
 @pytest.mark.asyncio
 async def test_health_check_db_failure(client: AsyncClient, mock_db_session: AsyncMock) -> None:
     mock_db_session.execute.side_effect = Exception("DB Connection Refused")
-    response = await client.get("/api/v1/health")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "degraded"
-    assert data["db"] == "disconnected"
+
+    async def override_bad_db():
+        yield mock_db_session
+
+    app.dependency_overrides[get_db] = override_bad_db
+    try:
+        response = await client.get("/api/v1/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "degraded"
+        assert data["db"] == "disconnected"
+    finally:
+        app.dependency_overrides.pop(get_db, None)
 
 
 @pytest.mark.asyncio

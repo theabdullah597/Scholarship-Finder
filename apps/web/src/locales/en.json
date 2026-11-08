@@ -1,8 +1,22 @@
 {
+  "common": {
+    "loading": "Loading...",
+    "verifying_session": "Verifying your security credentials...",
+    "email": "Email address",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "full_name": "Full name",
+    "submit": "Submit",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "back_to_login": "Back to login",
+    "or": "or",
+    "logout": "Log out"
+  },
   "app": {
     "title": "OpportunityAbroad",
     "tagline": "AI-Powered Global Scholarships & Internships",
-    "phase_badge": "Phase 0: Foundations Active",
+    "phase_badge": "Phase 1: Authentication & Roles",
     "description": "Connecting ambitious students worldwide with fully-funded and verified academic opportunities abroad.",
     "roles": {
       "student": "Student Portal",
@@ -22,9 +36,66 @@
       "worker": "Background Ingestion Worker: Standby"
     },
     "actions": {
-      "explore": "Explore Opportunities (Coming in Phase 2)",
-      "docs": "Architecture Blueprint"
+      "explore": "Explore Opportunities",
+      "docs": "Architecture Blueprint",
+      "sign_in": "Sign In",
+      "sign_up": "Create Account"
     }
+  },
+  "auth": {
+    "login_title": "Sign in to OpportunityAbroad",
+    "login_subtitle": "Access your saved scholarships, applications, and reminders.",
+    "login_button": "Sign In",
+    "register_title": "Create your student account",
+    "register_subtitle": "Start discovering scholarships and academic opportunities abroad.",
+    "register_button": "Create Account",
+    "forgot_password_title": "Reset your password",
+    "forgot_password_subtitle": "Enter your email address and we'll send you a password reset link.",
+    "send_reset_link": "Send Reset Link",
+    "reset_password_title": "Set new password",
+    "reset_password_subtitle": "Please enter and confirm your new account password.",
+    "reset_button": "Update Password",
+    "verify_email_title": "Verify your email address",
+    "verify_email_subtitle": "Enter the verification code sent to your inbox to activate your account.",
+    "verify_button": "Confirm Verification",
+    "no_account": "Don't have an account yet?",
+    "already_have_account": "Already have an account?",
+    "forgot_password_link": "Forgot password?",
+    "forbidden_title": "Access Denied (403)",
+    "forbidden_description": "You do not have administrator privileges required to access this resource.",
+    "return_to_dashboard": "Return to Dashboard",
+    "email_placeholder": "student@university.edu",
+    "password_placeholder": "••••••••",
+    "full_name_placeholder": "Jane Doe",
+    "token_placeholder": "Paste verification token here",
+    "new_password_placeholder": "Min. 8 characters",
+    "password_mismatch": "Passwords do not match.",
+    "password_too_short": "Password must be at least 8 characters long.",
+    "verification_code": "Verification Code"
+  },
+  "dashboard": {
+    "title": "Student Dashboard",
+    "welcome": "Welcome back",
+    "role_badge": "Role: Student",
+    "go_to_dashboard": "Go to Dashboard",
+    "profile_section": "Academic Interests & Target Destinations",
+    "profile_saved_success": "Your student profile has been updated successfully.",
+    "citizenship": "Citizenship (ISO 2-letter country code)",
+    "target_countries": "Target Countries (comma separated codes, e.g., DE, CA, US)",
+    "fields_of_interest": "Fields of Interest (comma separated, e.g., AI, Biotechnology)",
+    "degree_level": "Target Degree Level",
+    "timezone": "Timezone",
+    "degree_levels": {
+      "bachelors": "Bachelor's Degree",
+      "masters": "Master's Degree",
+      "phd": "PhD / Doctorate",
+      "postdoc": "Postdoctoral Research"
+    }
+  },
+  "admin": {
+    "title": "Administrator Control Center",
+    "role_badge": "Role: System Admin",
+    "rbac_verified": "RBAC verification check: PASSED (Admin credentials verified)",
+    "notice": "Administrative opportunity ingestion controls, moderation queues, and audit log viewing will be fully enabled in Phase 2 & 3."
   }
 }
-

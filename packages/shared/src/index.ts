@@ -15,6 +15,31 @@ export type ApplicationStatus =
   | 'rejected'
   | 'withdrawn';
 
+export interface StudentProfileData {
+  id: string;
+  full_name?: string | null;
+  citizenship?: string | null;
+  target_countries: string[];
+  fields_of_interest: string[];
+  target_degree_level?: string | null;
+  timezone: string;
+}
+
+export interface UserData {
+  id: string;
+  email: string;
+  role: UserRole;
+  is_verified: boolean;
+  created_at: string;
+  profile?: StudentProfileData | null;
+}
+
+export interface AuthTokens {
+  access_token: string;
+  token_type: string;
+  user?: UserData;
+}
+
 export interface OpportunityItem {
   id: string;
   kind: OpportunityKind;
@@ -48,4 +73,3 @@ export interface HealthCheckResponse {
   version: string;
   timestamp: string;
 }
-

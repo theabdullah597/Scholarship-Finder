@@ -6,7 +6,7 @@
 - **Acceptance Criteria**: `docker compose up` works, health endpoint returns 200 with DB and Redis checks, web shows a placeholder page, and CI commands pass locally.
 
 ## Phase 1: Auth and Roles
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement models and migrations for `users`, `student_profiles`, `refresh_tokens`; endpoints for register, verify email (Mailpit), login, refresh with rotation and reuse detection, logout, forgot and reset password, GET and PATCH `/me`; server-side `require_role` dependency; script to seed/create first admin; React AuthContext, Login, Register, Forgot Password, and ProtectedRoute.
 - **Acceptance Criteria**: Register, verify, log in, stay logged in after refresh, log out; student gets 403 on admin routes; all test suites pass.
 

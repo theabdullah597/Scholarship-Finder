@@ -1,9 +1,20 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Compass, GraduationCap, ShieldCheck, Zap, Database, Server, Clock } from 'lucide-react';
+import { GraduationCap, Compass, ShieldCheck, Zap, Database, Server, Clock, LogIn, UserPlus } from 'lucide-react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
-export const App: React.FC = () => {
+const HomePage: React.FC = () => {
   const { t } = useTranslation();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col justify-between">
@@ -16,15 +27,38 @@ export const App: React.FC = () => {
               {t('app.title')}
             </span>
           </div>
+
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-              {t('app.phase_badge')}
-            </span>
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition"
+              >
+                <span>Dashboard ({user?.email})</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-brand-600 px-3 py-2 transition"
+                >
+                  <LogIn className="h-4 w-4" aria-hidden="true" />
+                  <span>{t('app.actions.sign_in')}</span>
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition"
+                >
+                  <UserPlus className="h-4 w-4" aria-hidden="true" />
+                  <span>{t('app.actions.sign_up')}</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Hero */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 flex flex-col items-center justify-center text-center">
         <div className="max-w-3xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 text-brand-700 text-sm font-semibold">
@@ -40,8 +74,34 @@ export const App: React.FC = () => {
             {t('app.description')}
           </p>
 
-          {/* Core Feature Pillars */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-start pt-6">
+          <div className="pt-2 flex flex-wrap justify-center gap-4">
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-brand-700 transition"
+              >
+                {t('dashboard.go_to_dashboard')}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-brand-700 transition"
+                >
+                  {t('app.actions.sign_up')}
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center rounded-xl bg-white border border-slate-300 px-6 py-3 text-base font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition"
+                >
+                  {t('app.actions.sign_in')}
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-start pt-8">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex items-start space-x-3 rtl:space-x-reverse">
               <Zap className="h-5 w-5 text-brand-600 mt-1 flex-shrink-0" aria-hidden="true" />
               <div>
@@ -106,5 +166,37 @@ export const App: React.FC = () => {
   );
 };
 
-export default App;
+export const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+};
 
+export default App;

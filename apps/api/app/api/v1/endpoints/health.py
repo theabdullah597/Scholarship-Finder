@@ -51,9 +51,7 @@ async def health_check(
         logger.warning("Redis health check failed: %s", exc)
         redis_status = "disconnected"
 
-    overall_status = (
-        "ok" if (db_status == "connected" and redis_status == "connected") else "degraded"
-    )
+    overall_status = "ok" if (db_status == "connected" and redis_status == "connected") else "degraded"
 
     return HealthCheckResponse(
         status=overall_status,
