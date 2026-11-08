@@ -1,5 +1,6 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +24,9 @@ def mock_redis() -> AsyncMock:
 
 
 @pytest.fixture
-async def client(mock_db_session: AsyncMock, mock_redis: AsyncMock) -> AsyncGenerator[AsyncClient, None]:
+async def client(
+    mock_db_session: AsyncMock, mock_redis: AsyncMock
+) -> AsyncGenerator[AsyncClient, None]:
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield mock_db_session
 
@@ -37,4 +40,3 @@ async def client(mock_db_session: AsyncMock, mock_redis: AsyncMock) -> AsyncGene
             yield ac
 
     app.dependency_overrides.clear()
-

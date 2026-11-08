@@ -1,15 +1,18 @@
 from datetime import datetime
+
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     """Base model class for all SQLAlchemy entities."""
+
     pass
 
 
 class TimestampMixin:
     """Mixin for models that need created_at and updated_at timestamps."""
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -21,4 +24,3 @@ class TimestampMixin:
         onupdate=func.now(),
         nullable=False,
     )
-

@@ -1,6 +1,7 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -55,4 +56,3 @@ async def root() -> dict[str, str]:
         "docs": "/docs",
         "health": "/api/v1/health",
     }
-

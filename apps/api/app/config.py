@@ -1,4 +1,3 @@
-from typing import List
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -49,7 +48,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
 
     @property
-    def allowed_origins_list(self) -> List[str]:
+    def allowed_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
 
     model_config = SettingsConfigDict(
@@ -60,4 +59,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

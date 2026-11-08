@@ -1,2 +1,1 @@
 """OpportunityAbroad API Application."""
-

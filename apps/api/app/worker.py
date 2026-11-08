@@ -2,6 +2,7 @@ import asyncio
 import logging
 import signal
 import sys
+
 from app.config import settings
 
 logging.basicConfig(
@@ -56,4 +57,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
