@@ -85,12 +85,20 @@ export const AdminDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* Phase 2 preview notice */}
-          <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-            <h2 className="text-lg font-bold text-white mb-2">Phase 1 Milestone Complete</h2>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              {t('admin.notice')}
-            </p>
+          {/* Phase 2 Opportunity Management Link */}
+          <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-white mb-1">{t('admin_ops.title')}</h2>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                {t('admin_ops.subtitle')}
+              </p>
+            </div>
+            <a
+              href="/admin/opportunities"
+              className="inline-flex items-center px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-sm shadow transition"
+            >
+              <span>{t('admin.manage_ops_link')}</span>
+            </a>
           </div>
         </div>
       </main>

@@ -11,6 +11,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Browse from './pages/Browse';
+import OpportunityDetail from './pages/OpportunityDetail';
+import AdminOpportunities from './pages/admin/Opportunities';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -29,6 +32,13 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              to="/opportunities"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-brand-600 px-3 py-2 transition"
+            >
+              <Compass className="h-4 w-4" aria-hidden="true" />
+              <span>{t('app.actions.explore')}</span>
+            </Link>
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
@@ -172,6 +182,8 @@ export const App: React.FC = () => {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/opportunities" element={<Browse />} />
+          <Route path="/opportunities/:id" element={<OpportunityDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
@@ -190,6 +202,14 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/opportunities"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminOpportunities />
               </ProtectedRoute>
             }
           />

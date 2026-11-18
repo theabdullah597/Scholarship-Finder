@@ -60,3 +60,18 @@
 - **Date**: 2026-11-08
 - **Decision**: Use Python 3.13 (not 3.14) for the backend virtual environment.
 - **Why**: pydantic-core requires Rust compilation via maturin, which fails on Python 3.14. Python 3.13 is the latest stable version with full binary wheel support for all dependencies.
+
+## ADR-009: Keyset Pagination & Keyset Cursor Encoding
+- **Date**: 2026-11-18
+- **Decision**: Keyset pagination for opportunities is encoded as URL-safe base64 strings containing the JSON tuple `{"c": timestamp_iso, "i": uuid_str}`. Query filters dynamically compare composite ordering keys `(created_at, id)` or `(deadline, id)`.
+- **Why**: 
+  - Standard offset pagination exhibits $O(N)$ performance degradation and drifts when concurrent inserts/deletions take place.
+  - Base64-encoded opaque cursor prevents clients from depending on underlying DB column structures while remaining completely deterministic across concurrent updates.
+  - Tested and proven stable when new rows are inserted during pagination.
+
+## ADR-010: Database Dialect Compatibility for Testing vs Production
+- **Date**: 2026-11-18
+- **Decision**: Define model column types using SQLAlchemy's `.with_variant()` pattern (e.g. `postgresql.JSONB().with_variant(sa.JSON(), "sqlite")` and `sa.ARRAY(sa.String).with_variant(sa.JSON(), "sqlite")`).
+- **Why**:
+  - Allows unit and integration tests to run with high speed and zero external service overhead on in-memory SQLite (`aiosqlite`).
+  - Production deployments use full native PostgreSQL capabilities (JSONB binary indexing and native arrays).

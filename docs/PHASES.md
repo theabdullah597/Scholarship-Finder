@@ -11,7 +11,7 @@
 - **Acceptance Criteria**: Register, verify, log in, stay logged in after refresh, log out; student gets 403 on admin routes; all test suites pass.
 
 ## Phase 2: Opportunities and Admin CRUD
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement models and migrations for `opportunities`, `sources`, `tags`, `audit_logs`; public list endpoint with filters, sorting, and keyset (cursor) pagination; detail endpoint; admin create, edit, verify, archive, bulk approve or reject with duplicate detection and audit rows; frontend browse page with URL-synced filters; admin table and form; seed script for 30 sample opportunities.
 - **Acceptance Criteria**: Filters combine correctly, cursors stay stable, students see only published items.
 

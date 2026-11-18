@@ -1,4 +1,14 @@
-import { UserData, StudentProfileData } from '@opportunity-abroad/shared';
+import {
+  AuditLogItem,
+  BulkModeratePayload,
+  KeysetPaginationResponse,
+  OpportunityCreatePayload,
+  OpportunityFilterParams,
+  OpportunityItem,
+  OpportunityPatchPayload,
+  StudentProfileData,
+  UserData,
+} from '@opportunity-abroad/shared';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -84,7 +94,7 @@ export const fetchWithAuth = async (endpoint: string, options: RequestInit = {})
     credentials: 'include',
   });
 
-  // If 401 Unauthorized occurs on an authenticated route (not on /auth/login or /auth/refresh)
+  // If 401 occurs on an authenticated route (not on /auth/login or /auth/refresh)
   if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/refresh')) {
     const refreshedToken = await refreshSession();
     if (refreshedToken) {
@@ -183,11 +193,112 @@ export const api = {
     },
   },
 
+  opportunities: {
+    list: async (params: OpportunityFilterParams = {}): Promise<KeysetPaginationResponse<OpportunityItem>> => {
+      const query = new URLSearchParams();
+      if (params.kind) query.set('kind', params.kind);
+      if (params.country) query.set('country', params.country);
+      if (params.funding) query.set('funding', params.funding);
+      if (params.field) query.set('field', params.field);
+      if (params.deadline_min) query.set('deadline_min', params.deadline_min);
+      if (params.deadline_max) query.set('deadline_max', params.deadline_max);
+      if (params.stipend_min !== undefined && params.stipend_min !== null) query.set('stipend_min', String(params.stipend_min));
+      if (params.stipend_max !== undefined && params.stipend_max !== null) query.set('stipend_max', String(params.stipend_max));
+      if (params.include_expired !== undefined) query.set('include_expired', String(params.include_expired));
+      if (params.sort) query.set('sort', params.sort);
+      if (params.cursor) query.set('cursor', params.cursor);
+      if (params.limit) query.set('limit', String(params.limit));
+
+      const qs = query.toString();
+      const res = await fetchWithAuth(`/opportunities${qs ? `?${qs}` : ''}`);
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch opportunities', data);
+      return data;
+    },
+
+    getById: async (id: string): Promise<OpportunityItem> => {
+      const res = await fetchWithAuth(`/opportunities/${id}`);
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Opportunity not found', data);
+      return data;
+    },
+  },
+
   admin: {
     testRbac: async () => {
       const res = await fetchWithAuth('/admin/test-rbac');
       const data = await res.json();
       if (!res.ok) throw new ApiError(res.status, data.detail || 'RBAC check failed', data);
+      return data;
+    },
+
+    opportunities: {
+      list: async (statusFilter?: string, q?: string, limit = 50, offset = 0): Promise<KeysetPaginationResponse<OpportunityItem>> => {
+        const query = new URLSearchParams();
+        if (statusFilter) query.set('status', statusFilter);
+        if (q) query.set('q', q);
+        query.set('limit', String(limit));
+        query.set('offset', String(offset));
+
+        const res = await fetchWithAuth(`/admin/opportunities?${query.toString()}`);
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch admin opportunities', data);
+        return data;
+      },
+
+      create: async (payload: OpportunityCreatePayload): Promise<OpportunityItem> => {
+        const res = await fetchWithAuth('/admin/opportunities', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to create opportunity', data);
+        return data;
+      },
+
+      patch: async (id: string, payload: OpportunityPatchPayload): Promise<OpportunityItem> => {
+        const res = await fetchWithAuth(`/admin/opportunities/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to update opportunity', data);
+        return data;
+      },
+
+      verify: async (id: string): Promise<OpportunityItem> => {
+        const res = await fetchWithAuth(`/admin/opportunities/${id}/verify`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to verify opportunity', data);
+        return data;
+      },
+
+      archive: async (id: string): Promise<OpportunityItem> => {
+        const res = await fetchWithAuth(`/admin/opportunities/${id}/archive`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to archive opportunity', data);
+        return data;
+      },
+
+      bulkModerate: async (payload: BulkModeratePayload) => {
+        const res = await fetchWithAuth('/admin/opportunities/bulk-moderate', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Bulk moderation failed', data);
+        return data;
+      },
+    },
+
+    auditLogs: async (targetId?: string, limit = 50): Promise<AuditLogItem[]> => {
+      const query = new URLSearchParams();
+      if (targetId) query.set('target_id', targetId);
+      query.set('limit', String(limit));
+
+      const res = await fetchWithAuth(`/admin/audit-logs?${query.toString()}`);
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch audit logs', data);
       return data;
     },
   },

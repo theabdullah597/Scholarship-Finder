@@ -40,8 +40,15 @@ export interface AuthTokens {
   user?: UserData;
 }
 
+export interface TagItem {
+  id: string;
+  name: string;
+  category?: string | null;
+}
+
 export interface OpportunityItem {
   id: string;
+  source_id?: string | null;
   kind: OpportunityKind;
   title: string;
   organization: string;
@@ -56,6 +63,7 @@ export interface OpportunityItem {
   source_url: string;
   canonical_url: string;
   status: OpportunityStatus;
+  tags?: TagItem[];
   created_at: string;
   updated_at: string;
 }
@@ -63,7 +71,75 @@ export interface OpportunityItem {
 export interface KeysetPaginationResponse<T> {
   items: T[];
   next_cursor: string | null;
-  total?: number;
+  total_count?: number;
+}
+
+export interface OpportunityFilterParams {
+  kind?: OpportunityKind;
+  country?: string;
+  funding?: FundingType;
+  field?: string;
+  deadline_min?: string;
+  deadline_max?: string;
+  stipend_min?: number;
+  stipend_max?: number;
+  include_expired?: boolean;
+  sort?: 'created_desc' | 'deadline_asc' | 'deadline_desc';
+  cursor?: string;
+  limit?: number;
+}
+
+export interface OpportunityCreatePayload {
+  kind: OpportunityKind;
+  title: string;
+  organization: string;
+  description: string;
+  country: string;
+  fields: string[];
+  funding_type: FundingType;
+  stipend_amount_min?: number | null;
+  stipend_amount_max?: number | null;
+  stipend_currency?: string | null;
+  deadline?: string | null;
+  source_url: string;
+  canonical_url: string;
+  tag_ids?: string[];
+}
+
+export interface OpportunityPatchPayload {
+  kind?: OpportunityKind;
+  title?: string;
+  organization?: string;
+  description?: string;
+  country?: string;
+  fields?: string[];
+  funding_type?: FundingType;
+  stipend_amount_min?: number | null;
+  stipend_amount_max?: number | null;
+  stipend_currency?: string | null;
+  deadline?: string | null;
+  source_url?: string;
+  canonical_url?: string;
+  status?: OpportunityStatus;
+  tag_ids?: string[];
+}
+
+export interface BulkModeratePayload {
+  items: Array<{
+    id: string;
+    action: 'approve' | 'publish' | 'reject' | 'archive';
+  }>;
+}
+
+export interface AuditLogItem {
+  id: string;
+  actor_user_id?: string | null;
+  action: string;
+  target_type: string;
+  target_id: string;
+  changes?: Record<string, unknown> | null;
+  ip_address?: string | null;
+  created_at: string;
 }
 
 export interface HealthCheckResponse {
