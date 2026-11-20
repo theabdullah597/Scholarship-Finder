@@ -99,3 +99,11 @@
   - Server-side ownership predicates prevent students from reading or changing another student's private data.
   - Calendar-day calculations respect each student's timezone instead of assuming UTC midnight.
   - Database-backed dedupe makes retries safe and keeps notifications authoritative even if email delivery is unavailable.
+
+## ADR-014: Admin Privacy and Broadcast Delivery
+- **Date**: 2026-11-20
+- **Decision**: Admin user listings expose a deterministic masked email (`first two local-part characters + *** + @domain`) and never return passwords or unmasked email addresses. Broadcasts reuse committed `Notification` rows and target only active users, optionally filtered by role; each campaign and user mutation writes an audit log entry.
+- **Why**:
+  - Masking lets administrators identify accounts without making the dashboard an unnecessary PII directory.
+  - Notifications are already the source of truth for student-facing messages, so a separate campaign table is not required for this phase.
+  - Persisting notifications before response completion keeps delivery visible and retry-safe, while audit rows preserve accountability for privileged actions.

@@ -15,6 +15,8 @@ import {
   NoteItem,
   NotificationItem,
   UserData,
+  AdminAnalytics,
+  AdminUserItem,
 } from '@opportunity-abroad/shared';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -326,6 +328,39 @@ export const api = {
       return data;
     },
 
+    users: {
+      list: async (params: { q?: string; role?: string; suspended?: boolean } = {}): Promise<AdminUserItem[]> => {
+        const query = new URLSearchParams();
+        if (params.q) query.set('q', params.q);
+        if (params.role) query.set('role', params.role);
+        if (params.suspended !== undefined) query.set('suspended', String(params.suspended));
+        const res = await fetchWithAuth(`/admin/users?${query.toString()}`);
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch users', data);
+        return data;
+      },
+      update: async (id: string, payload: { role?: string; is_suspended?: boolean }): Promise<AdminUserItem> => {
+        const res = await fetchWithAuth(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to update user', data);
+        return data;
+      },
+    },
+
+    analytics: async (): Promise<AdminAnalytics> => {
+      const res = await fetchWithAuth('/admin/analytics');
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch analytics', data);
+      return data;
+    },
+
+    broadcast: async (payload: { title: string; message: string; audience?: string }): Promise<{ recipients: number; notification_kind: string }> => {
+      const res = await fetchWithAuth('/admin/broadcasts', { method: 'POST', body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to send broadcast', data);
+      return data;
+    },
+
     opportunities: {
       list: async (statusFilter?: string, q?: string, limit = 50, offset = 0): Promise<KeysetPaginationResponse<OpportunityItem>> => {
         const query = new URLSearchParams();
@@ -385,9 +420,10 @@ export const api = {
       },
     },
 
-    auditLogs: async (targetId?: string, limit = 50): Promise<AuditLogItem[]> => {
+    auditLogs: async (targetId?: string, limit = 50, action?: string): Promise<AuditLogItem[]> => {
       const query = new URLSearchParams();
       if (targetId) query.set('target_id', targetId);
+      if (action) query.set('action', action);
       query.set('limit', String(limit));
 
       const res = await fetchWithAuth(`/admin/audit-logs?${query.toString()}`);

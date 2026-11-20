@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     admin,
     admin_opportunities,
+    admin_dashboard,
     admin_sources,
     auth,
     health,
@@ -22,4 +23,5 @@ api_v1_router.include_router(opportunities.router)
 api_v1_router.include_router(search.router)
 api_v1_router.include_router(student.router)
 api_v1_router.include_router(admin_opportunities.router)
+api_v1_router.include_router(admin_dashboard.router)
 api_v1_router.include_router(admin_sources.router)

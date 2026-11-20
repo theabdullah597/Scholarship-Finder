@@ -1,112 +1,116 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, LogOut, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2, LogOut, ShieldCheck } from 'lucide-react';
+import { AdminAnalytics, AdminUserItem } from '@opportunity-abroad/shared';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
 export const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
-
-  const [rbacStatus, setRbacStatus] = useState<string | null>(null);
+  const { logout } = useAuth();
+  const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
+  const [users, setUsers] = useState<AdminUserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [broadcast, setBroadcast] = useState({ title: '', message: '', audience: '' });
+  const [broadcastResult, setBroadcastResult] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const [analyticsData, usersData] = await Promise.all([api.admin.analytics(), api.admin.users.list()]);
+      setAnalytics(analyticsData);
+      setUsers(usersData);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('admin.load_error'));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
 
   useEffect(() => {
-    const verifyRbac = async () => {
-      try {
-        const res = await api.admin.testRbac();
-        setRbacStatus(res.message);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'RBAC verification failed';
-        setError(msg);
-      } finally {
-        setLoading(false);
-      }
-    };
-    verifyRbac();
-  }, []);
+    void load();
+  }, [load]);
+
+  const updateUser = async (user: AdminUserItem, payload: { role?: string; is_suspended?: boolean }) => {
+    try {
+      const updated = await api.admin.users.update(user.id, payload);
+      setUsers((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setAnalytics(await api.admin.analytics());
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('admin.update_error'));
+    }
+  };
+
+  const sendBroadcast = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      const result = await api.admin.broadcast({
+        title: broadcast.title,
+        message: broadcast.message,
+        audience: broadcast.audience || undefined,
+      });
+      setBroadcastResult(t('admin.broadcast_sent', { count: result.recipients }));
+      setBroadcast({ title: '', message: '', audience: '' });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('admin.broadcast_error'));
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
-      {/* Admin Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+    <div className="min-h-screen bg-slate-900 text-slate-100">
+      <header className="border-b border-slate-700 bg-slate-800">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+          <div className="flex items-center gap-3">
             <ShieldCheck className="h-8 w-8 text-amber-500" aria-hidden="true" />
-            <span className="text-xl font-bold tracking-tight text-white">
-              {t('admin.title')}
-            </span>
-            <span className="ms-2 inline-flex items-center rounded-md bg-amber-400/10 px-2 py-1 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-400/20">
-              {t('admin.role_badge')}
-            </span>
+            <h1 className="text-xl font-bold">{t('admin.title')}</h1>
           </div>
-
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            <a
-              href="/dashboard"
-              className="inline-flex items-center space-x-1.5 rtl:space-x-reverse text-xs text-slate-300 hover:text-white bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600 transition"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Student View</span>
-            </a>
-            <a
-              href="/admin/sources"
-              className="inline-flex items-center px-4 py-2.5 rounded-xl border border-amber-500 text-amber-400 font-bold text-sm hover:bg-amber-500/10 transition"
-            >
-              <span>{t('admin_sources.manage_link')}</span>
-            </a>
-            <button
-              onClick={() => logout()}
-              className="inline-flex items-center space-x-1.5 rtl:space-x-reverse text-sm font-medium text-slate-400 hover:text-red-400 transition"
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              <span>{t('common.logout')}</span>
-            </button>
-          </div>
+          <button onClick={() => void logout()} className="flex items-center gap-2 text-sm text-slate-300 hover:text-white">
+            <LogOut className="h-4 w-4" aria-hidden="true" /> {t('common.logout')}
+          </button>
         </div>
       </header>
-
-      {/* Main Admin Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* RBAC Verification Alert */}
-          {loading ? (
-            <div className="p-6 bg-slate-800 rounded-2xl border border-slate-700 flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-amber-400" aria-hidden="true" />
-              <span className="text-sm text-slate-300">Executing server-side RBAC validation...</span>
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+        {loading && <Loader2 className="h-6 w-6 animate-spin text-amber-400" aria-label={t('common.loading')} />}
+        {error && <div className="flex items-center gap-2 rounded-lg border border-red-800 bg-red-950/50 p-4 text-red-200"><AlertCircle className="h-5 w-5" />{error}</div>}
+        {analytics && (
+          <section aria-labelledby="analytics-title">
+            <h2 id="analytics-title" className="mb-3 text-lg font-bold">{t('admin.analytics_title')}</h2>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {Object.entries(analytics).map(([key, value]) => (
+                <div key={key} className="rounded-xl border border-slate-700 bg-slate-800 p-4">
+                  <p className="text-xs text-slate-400">{t(`admin.metrics.${key}`)}</p>
+                  <p className="mt-1 text-2xl font-bold text-amber-400">{value}</p>
+                </div>
+              ))}
             </div>
-          ) : error ? (
-            <div className="p-6 bg-red-950/60 rounded-2xl border border-red-800 flex items-center gap-3 text-red-200">
-              <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
-              <span className="text-sm">{error}</span>
-            </div>
-          ) : (
-            <div className="p-6 bg-emerald-950/40 rounded-2xl border border-emerald-800 flex items-center gap-3 text-emerald-200">
-              <ShieldCheck className="h-6 w-6 text-emerald-400 flex-shrink-0" aria-hidden="true" />
-              <div>
-                <p className="font-semibold text-sm">{t('admin.rbac_verified')}</p>
-                <p className="text-xs text-emerald-400/80 mt-0.5">Status: {rbacStatus} (Admin user: {user?.email})</p>
-              </div>
-            </div>
-          )}
-
-          {/* Phase 2 Opportunity Management Link */}
-          <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-bold text-white mb-1">{t('admin_ops.title')}</h2>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                {t('admin_ops.subtitle')}
-              </p>
-            </div>
-            <a
-              href="/admin/opportunities"
-              className="inline-flex items-center px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-sm shadow transition"
-            >
-              <span>{t('admin.manage_ops_link')}</span>
-            </a>
+          </section>
+        )}
+        <section className="rounded-xl border border-slate-700 bg-slate-800 p-5">
+          <h2 className="mb-4 text-lg font-bold">{t('admin.users_title')}</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead><tr className="border-b border-slate-700 text-slate-400"><th className="p-2">{t('common.email')}</th><th className="p-2">{t('admin.role')}</th><th className="p-2">{t('admin.status')}</th><th className="p-2">{t('common.actions')}</th></tr></thead>
+              <tbody>{users.map((user) => <tr key={user.id} className="border-b border-slate-700/50">
+                <td className="p-2">{user.email}</td>
+                <td className="p-2">
+                  <select value={user.role} onChange={(event) => void updateUser(user, { role: event.target.value })} className="rounded bg-slate-700 p-1">
+                    <option value="student">{t('admin.student')}</option><option value="admin">{t('admin.admin')}</option>
+                  </select>
+                </td>
+                <td className="p-2">{user.is_suspended ? t('admin.suspended') : t('admin.active')}</td>
+                <td className="p-2"><button onClick={() => void updateUser(user, { is_suspended: !user.is_suspended })} className="text-amber-400 hover:underline">{user.is_suspended ? t('admin.restore') : t('admin.suspend')}</button></td>
+              </tr>)}</tbody>
+            </table>
           </div>
-        </div>
+        </section>
+        <form onSubmit={sendBroadcast} className="space-y-3 rounded-xl border border-slate-700 bg-slate-800 p-5">
+          <h2 className="text-lg font-bold">{t('admin.broadcast_title')}</h2>
+          <input required value={broadcast.title} onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })} placeholder={t('admin.broadcast_subject')} className="w-full rounded bg-slate-700 p-2" />
+          <textarea required value={broadcast.message} onChange={(e) => setBroadcast({ ...broadcast, message: e.target.value })} placeholder={t('admin.broadcast_message')} className="w-full rounded bg-slate-700 p-2" rows={3} />
+          <select value={broadcast.audience} onChange={(e) => setBroadcast({ ...broadcast, audience: e.target.value })} className="rounded bg-slate-700 p-2"><option value="">{t('admin.all_users')}</option><option value="student">{t('admin.student')}</option><option value="admin">{t('admin.admin')}</option></select>
+          <button type="submit" className="rounded bg-amber-500 px-4 py-2 font-bold text-slate-900">{t('admin.send_broadcast')}</button>
+          {broadcastResult && <p className="text-emerald-300">{broadcastResult}</p>}
+        </form>
       </main>
     </div>
   );

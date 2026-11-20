@@ -10,10 +10,15 @@
 | Phase 3 | Ingestion (Worker, RSS/JSON/HTML fetchers, Normalizer, Deduplication, Ingestion runs) | done |
 | Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | done |
 | Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | done |
-| Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | todo |
+| Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | done |
 | Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | todo |
 
 ## Last Completed
+- **Phase 6 Admin Dashboard**:
+  - **User management**: Added admin-only user listing with masked email addresses, role assignment, suspension/restore controls, self-suspension protection, and audit records for mutations.
+  - **Operations**: Added aggregate analytics, database-backed broadcasts to active users or a selected role, and action/target-filtered audit-log viewing.
+  - **Frontend**: Expanded the localized admin dashboard with analytics cards, user controls, and broadcast composition while retaining role-protected admin operations.
+  - **Tests and validation**: Added backend coverage for masked users, suspension audit records, broadcast recipients, and admin RBAC. Frontend lint, strict typecheck, Vitest, and production build pass; backend execution requires the repository virtual environment because the system interpreter lacks asyncpg.
 - **Phase 5 Student Dashboard**:
   - **Student data**: Added applications, notes, and notifications tables with ownership constraints and migration. Students can save published opportunities, track application status, create private notes, and mark notifications read.
   - **Reminders**: Added a daily worker job for 14-, 7-, and 1-day deadline reminders using each profile timezone, unique dedupe keys, notification records, and Mailpit email delivery.
@@ -110,4 +115,4 @@
 - **React `act()` warnings** in test stderr — cosmetic noise from async state updates in AuthProvider, does not affect test correctness. Standard React 18 behavior.
 
 ## Next Step
-- **Phase 6: Admin Dashboard** — User management, analytics, broadcast notifications, audit log viewer, and masked email privacy controls.
+- **Phase 7: Hardening & Launch** — Security headers, rate limits, i18n/RTL review, load testing, deployment, and runbooks.

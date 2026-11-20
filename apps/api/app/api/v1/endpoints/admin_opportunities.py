@@ -454,6 +454,7 @@ async def admin_bulk_moderate(
 
 @router.get("/audit-logs", response_model=list[AuditLogOut])
 async def admin_list_audit_logs(
+    action: str | None = Query(default=None),
     target_type: str | None = Query(default=None),
     target_id: str | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
@@ -462,6 +463,8 @@ async def admin_list_audit_logs(
 ) -> list[AuditLogOut]:
     """Retrieve system audit logs for administrative tracking."""
     stmt = select(AuditLog)
+    if action:
+        stmt = stmt.where(AuditLog.action == action)
     if target_type:
         stmt = stmt.where(AuditLog.target_type == target_type)
     if target_id:

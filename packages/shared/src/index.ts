@@ -168,6 +168,26 @@ export interface AuditLogItem {
   created_at: string;
 }
 
+export interface AdminUserItem {
+  id: string;
+  email: string;
+  role: UserRole;
+  is_verified: boolean;
+  is_suspended: boolean;
+  created_at: string;
+}
+
+export interface AdminAnalytics {
+  users_total: number;
+  users_students: number;
+  users_admins: number;
+  users_suspended: number;
+  opportunities_published: number;
+  opportunities_pending: number;
+  applications_total: number;
+  ingestion_runs_total: number;
+}
+
 export type SourceType = 'rss' | 'json_api' | 'html_scraper';
 
 export interface SourceItem {
