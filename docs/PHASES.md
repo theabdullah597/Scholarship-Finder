@@ -21,7 +21,7 @@
 - **Acceptance Criteria**: Three sources ingest on schedule, reruns create no duplicates, failures are counted and do not crash/stop a run.
 
 ## Phase 4: AI Search
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement `LLMProvider` interface with a real adapter and `FakeProvider` for tests; embeddings generation; `POST /search` with query parsing, hybrid retrieval (0.6 vector, 0.4 full text, top 50), rerank with reasons, output validation, non-AI fallback, Redis cache (10 min), rate limits (30 per hour per user), and circuit breaker; frontend search UI.
 - **Acceptance Criteria**: Works with and without the provider; cached responses under 300 ms; no result references a missing opportunity.
 

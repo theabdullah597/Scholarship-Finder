@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # AI search
+    AI_PROVIDER: str = "fake"
+    AI_BASE_URL: str = "https://api.openai.com/v1"
+    AI_API_KEY: str = ""
+    AI_MODEL: str = "gpt-4o-mini"
+    AI_EMBEDDING_MODEL: str = "text-embedding-3-small"
+
     # SMTP / Mailpit
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025

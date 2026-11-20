@@ -171,6 +171,19 @@ export interface IngestionRunItem {
   finished_at?: string | null;
 }
 
+export interface SearchResultItem {
+  opportunity: OpportunityItem;
+  score: number;
+  reason: string;
+}
+
+export interface SearchResponse {
+  results: SearchResultItem[];
+  cached: boolean;
+  fallback: boolean;
+  remaining_requests?: number | null;
+}
+
 export interface HealthCheckResponse {
   status: 'ok' | 'degraded';
   db: 'connected' | 'disconnected';

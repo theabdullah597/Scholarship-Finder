@@ -130,6 +130,7 @@ class Opportunity(Base, TimestampMixin):
     deadline: Mapped[datetime | None] = mapped_column(sa.DateTime(timezone=True), nullable=True, index=True)
     source_url: Mapped[str] = mapped_column(sa.Text, nullable=False)
     canonical_url: Mapped[str] = mapped_column(sa.Text, unique=True, index=True, nullable=False)
+    embedding: Mapped[list[float] | None] = mapped_column(JSONType, nullable=True)
     status: Mapped[str] = mapped_column(
         sa.String(32),
         default=OpportunityStatus.PENDING_REVIEW.value,

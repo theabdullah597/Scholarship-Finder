@@ -50,6 +50,7 @@
     },
     "actions": {
       "explore": "Explore Opportunities",
+      "search": "AI Search",
       "docs": "Architecture Blueprint",
       "sign_in": "Sign In",
       "sign_up": "Create Account",
@@ -144,6 +145,19 @@
     "deadline_prefix": "Deadline:",
     "no_deadline": "Rolling admissions / No deadline specified",
     "stipend_prefix": "Stipend:"
+  },
+  "search": {
+    "title": "Find your best-fit opportunity",
+    "subtitle": "Describe your goals naturally and receive grounded matches from verified listings.",
+    "input_label": "Search query",
+    "placeholder": "e.g. Fully funded AI PhD in Germany with a monthly stipend",
+    "button": "Search",
+    "browse_link": "Browse all opportunities",
+    "ai_notice": "AI-ranked matches from verified opportunities.",
+    "fallback_notice": "Showing reliable keyword and semantic matches while AI ranking is unavailable.",
+    "cached_notice": "Cached result.",
+    "no_results": "No matching opportunities found.",
+    "error": "Search could not be completed."
   },
   "kinds": {
     "scholarship": "Scholarship",

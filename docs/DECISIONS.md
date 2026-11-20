@@ -83,3 +83,11 @@
   - A source outage or malformed record must not stop other scheduled sources or valid records from being processed.
   - Explicit failure counts and partial-failure statuses give administrators actionable run history while keeping the worker alive.
   - Polling the configured `fetch_interval_minutes` keeps scheduling simple and avoids adding a second queue dependency before it is needed.
+
+## ADR-012: Grounded Hybrid Search Resilience
+- **Date**: 2026-11-20
+- **Decision**: Search first retrieves only published database opportunities using a deterministic semantic-plus-lexical score (0.6/0.4), then optionally asks an `LLMProvider` to rerank the top 50. Provider output is advisory and strictly validated; Redis caches final IDs and explanations for 10 minutes, while a per-process circuit breaker and deterministic fallback keep search available.
+- **Why**:
+  - Retrieval remains grounded in PostgreSQL and cannot expose hallucinated or unpublished opportunities.
+  - Deterministic scoring provides useful behavior in tests, local development, provider outages, and missing API credentials.
+  - Caching and rate limiting protect provider cost and latency without making Redis the source of truth.

@@ -8,12 +8,18 @@
 | Phase 1 | Auth & Roles (Argon2id, JWT + rotating refresh cookie, RBAC, Student & Admin contexts) | done |
 | Phase 2 | Opportunities & Admin CRUD (Models, Keyset pagination, Filters, Audit logs, Browse & Admin UI) | done |
 | Phase 3 | Ingestion (Worker, RSS/JSON/HTML fetchers, Normalizer, Deduplication, Ingestion runs) | done |
-| Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | todo |
+| Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | done |
 | Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | todo |
 | Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | todo |
 | Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | todo |
 
 ## Last Completed
+- **Phase 4 AI Search**:
+  - **Grounded retrieval**: Added a provider interface, deterministic `FakeProvider`, optional OpenAI-compatible adapter, query embeddings, 0.6 semantic + 0.4 lexical scoring, top-50 candidate retrieval, and validated reranking.
+  - **Safety and resilience**: Search is restricted to published database opportunities; unknown provider IDs are discarded, scores are clamped, reasons are markup-stripped, fallback ranking works without AI, and a three-failure circuit breaker prevents repeated provider calls.
+  - **Performance controls**: Added Redis response caching for 10 minutes and a 30 requests/hour per-user rate limit. Cache and rate-limit outages fail safely to database-backed search with warnings.
+  - **API and UI**: Added authenticated `POST /api/v1/search`, embedding storage migration, shared contracts, and a localized protected search page with fallback/cached state messaging.
+  - **Tests and validation**: 26 backend tests pass, including provider validation, published-only filtering, fallback, and cache behavior; Ruff, mypy, frontend lint, strict typecheck, nine Vitest tests, and production build pass.
 - **Phase 3 Ingestion**:
   - **Pipeline**: Added RSS/Atom, configurable JSON API, and CSS-selector HTML fetchers; sanitized and normalized untrusted text, URLs, country codes, opportunity kinds, funding types, deadlines, and stipend values.
   - **Reliability**: Added per-source `ingestion_runs` tracking, per-item failure isolation, partial-failure status, bounded error logs, and a polling worker scheduler that runs active sources when their configured interval is due.
@@ -98,4 +104,4 @@
 - **React `act()` warnings** in test stderr — cosmetic noise from async state updates in AuthProvider, does not affect test correctness. Standard React 18 behavior.
 
 ## Next Step
-- **Phase 4: AI Search** — LLM provider interface and fake provider, embeddings, hybrid retrieval, validated reranking, fallback search, Redis caching/rate limits, and the search UI.
+- **Phase 5: Student Dashboard** — Saved opportunities, applications, notes, deadline reminders, notifications, and privacy export/delete workflows.

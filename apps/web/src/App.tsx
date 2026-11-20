@@ -15,6 +15,7 @@ import Browse from './pages/Browse';
 import OpportunityDetail from './pages/OpportunityDetail';
 import AdminOpportunities from './pages/admin/Opportunities';
 import AdminSources from './pages/admin/Sources';
+import Search from './pages/Search';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -40,6 +41,14 @@ const HomePage: React.FC = () => {
               <Compass className="h-4 w-4" aria-hidden="true" />
               <span>{t('app.actions.explore')}</span>
             </Link>
+            {isAuthenticated && (
+              <Link
+                to="/search"
+                className="text-sm font-medium text-slate-700 hover:text-brand-600 px-3 py-2 transition"
+              >
+                {t('app.actions.search')}
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
@@ -185,6 +194,14 @@ export const App: React.FC = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/opportunities" element={<Browse />} />
           <Route path="/opportunities/:id" element={<OpportunityDetail />} />
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute>
+                <Search />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />

@@ -10,6 +10,7 @@ import {
   StudentProfileData,
   SourceItem,
   SourceType,
+  SearchResponse,
   UserData,
 } from '@opportunity-abroad/shared';
 
@@ -225,6 +226,16 @@ export const api = {
       if (!res.ok) throw new ApiError(res.status, data.detail || 'Opportunity not found', data);
       return data;
     },
+  },
+
+  search: async (query: string): Promise<SearchResponse> => {
+    const res = await fetchWithAuth('/search', {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new ApiError(res.status, data.detail || 'Search failed', data);
+    return data;
   },
 
   admin: {
