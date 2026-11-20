@@ -36,7 +36,7 @@
 - **Acceptance Criteria**: Every admin action writes an `audit_logs` record; suspended users cannot log in or refresh tokens.
 
 ## Phase 7: Hardening and Launch
-- **Status**: todo
+- **Status**: done
 - **Goal**: Apply security headers, CSP, CORS allow-list, rate limits on auth routes, dependency and static vulnerability scans; axe accessibility checks and fixes; second locale (i18n / RTL-ready); k6 load test script; production Dockerfiles; Kubernetes manifests; structured logging, Prometheus metrics, backup and restore docs, and operations runbooks.
 - **Acceptance Criteria**: Launch checklist complete and all remaining risks catalogued.
 

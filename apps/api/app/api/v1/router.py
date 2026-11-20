@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     admin,
-    admin_opportunities,
     admin_dashboard,
+    admin_opportunities,
     admin_sources,
     auth,
     health,

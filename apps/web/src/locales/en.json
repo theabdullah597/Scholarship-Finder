@@ -24,7 +24,10 @@
     "close": "Close",
     "confirm": "Confirm",
     "success": "Success",
-    "error": "Error"
+    "error": "Error",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic"
   },
   "app": {
     "title": "OpportunityAbroad",

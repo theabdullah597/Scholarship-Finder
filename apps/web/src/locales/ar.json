@@ -1,0 +1,26 @@
+{
+  "common": {
+    "language": "اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "loading": "جار التحميل...",
+    "logout": "تسجيل الخروج"
+  },
+  "app": {
+    "actions": {
+      "explore": "استكشف الفرص",
+      "search": "البحث الذكي",
+      "sign_in": "تسجيل الدخول",
+      "sign_up": "إنشاء حساب"
+    },
+    "title": "OpportunityAbroad",
+    "tagline": "منح وتدريبات عالمية مدعومة بالذكاء الاصطناعي"
+  },
+  "auth": {
+    "login_title": "تسجيل الدخول إلى OpportunityAbroad",
+    "login_button": "تسجيل الدخول"
+  },
+  "dashboard": {
+    "title": "لوحة الطالب"
+  }
+}

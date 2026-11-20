@@ -19,6 +19,7 @@ import Search from './pages/Search';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
+  const { i18n } = useTranslation();
   const { isAuthenticated, user } = useAuth();
 
   return (
@@ -34,6 +35,16 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <label className="sr-only" htmlFor="language-select">{t('common.language')}</label>
+            <select
+              id="language-select"
+              value={i18n.language.startsWith('ar') ? 'ar' : 'en'}
+              onChange={(event) => void i18n.changeLanguage(event.target.value)}
+              className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700"
+            >
+              <option value="en">{t('common.english')}</option>
+              <option value="ar">{t('common.arabic')}</option>
+            </select>
             <Link
               to="/opportunities"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-brand-600 px-3 py-2 transition"

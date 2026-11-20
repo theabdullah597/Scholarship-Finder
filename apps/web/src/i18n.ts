@@ -2,10 +2,14 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import enTranslation from './locales/en.json';
+import arTranslation from './locales/ar.json';
 
 const resources = {
   en: {
     translation: enTranslation,
+  },
+  ar: {
+    translation: arTranslation,
   },
 };
 
@@ -19,6 +23,14 @@ i18n
       escapeValue: false, // React already escapes values
     },
   });
+
+const updateDirection = (language: string): void => {
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+};
+
+updateDirection(i18n.language);
+i18n.on('languageChanged', updateDirection);
 
 export default i18n;
 

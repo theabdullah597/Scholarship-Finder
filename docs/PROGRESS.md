@@ -11,9 +11,14 @@
 | Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | done |
 | Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | done |
 | Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | done |
-| Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | todo |
+| Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | done |
 
 ## Last Completed
+- **Phase 7 Hardening & Launch**:
+  - **API security**: Added strict CORS methods/headers, security headers, request IDs, structured JSON logs without request PII, production secret validation, SameSite=Strict refresh cookies, and Redis-backed fixed-window throttling for authentication routes.
+  - **Frontend and accessibility**: Added Arabic locale support with automatic RTL document direction, a language switcher, strict Nginx security headers, and an axe Playwright smoke check.
+  - **Launch assets**: Added k6 search thresholds, dependency and Bandit scans in CI, Kubernetes manifests, encrypted PostgreSQL backup/restore guidance, an operations runbook, and a dependency risk register.
+  - **Tests and validation**: 34 backend tests pass, including security-header and rate-limit cases; Ruff, frontend lint, strict typecheck, Vitest, and production build pass. Browser-based axe/k6 execution requires the local services and Playwright/k6 tooling.
 - **Phase 6 Admin Dashboard**:
   - **User management**: Added admin-only user listing with masked email addresses, role assignment, suspension/restore controls, self-suspension protection, and audit records for mutations.
   - **Operations**: Added aggregate analytics, database-backed broadcasts to active users or a selected role, and action/target-filtered audit-log viewing.
@@ -115,4 +120,4 @@
 - **React `act()` warnings** in test stderr — cosmetic noise from async state updates in AuthProvider, does not affect test correctness. Standard React 18 behavior.
 
 ## Next Step
-- **Phase 7: Hardening & Launch** — Security headers, rate limits, i18n/RTL review, load testing, deployment, and runbooks.
+- **Post-launch maintenance** — Review the dependency risk register, schedule breaking-safe toolchain upgrades, and run browser axe/k6 checks in CI infrastructure with the deployed services.

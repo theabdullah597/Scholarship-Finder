@@ -107,3 +107,11 @@
   - Masking lets administrators identify accounts without making the dashboard an unnecessary PII directory.
   - Notifications are already the source of truth for student-facing messages, so a separate campaign table is not required for this phase.
   - Persisting notifications before response completion keeps delivery visible and retry-safe, while audit rows preserve accountability for privileged actions.
+
+## ADR-015: Launch Hardening and Dependency Risk Handling
+- **Date**: 2026-11-20
+- **Decision**: Enforce security headers, strict production CORS, request IDs, structured non-PII logs, Redis-backed authentication throttling, Arabic/RTL support, and reproducible k6/axe launch checks. Dependency audits run in CI and remain visible when current fixes require breaking toolchain upgrades; those findings are tracked in `docs/SECURITY_RISKS.md` rather than force-upgraded blindly.
+- **Why**:
+  - Headers, allow-lists, throttling, and request correlation reduce common web attack and incident-response risks without changing the domain model.
+  - RTL support and axe checks make accessibility part of the release path instead of a post-launch retrofit.
+  - Explicit risk tracking prevents a forced dependency upgrade from silently breaking the tested frontend while retaining audit visibility.

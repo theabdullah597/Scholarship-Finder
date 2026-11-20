@@ -41,7 +41,7 @@ def set_refresh_cookie(response: Response, raw_token: str) -> None:
         value=raw_token,
         httponly=True,
         secure=(settings.ENVIRONMENT == "production"),
-        samesite="lax",
+        samesite="strict",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600,
         path=COOKIE_PATH,
     )
@@ -53,7 +53,7 @@ def clear_refresh_cookie(response: Response) -> None:
         path=COOKIE_PATH,
         httponly=True,
         secure=(settings.ENVIRONMENT == "production"),
-        samesite="lax",
+        samesite="strict",
     )
 
 
