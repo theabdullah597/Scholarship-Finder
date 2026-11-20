@@ -220,5 +220,32 @@
     "success_verified": "Opportunity published and verified.",
     "success_archived": "Opportunity archived.",
     "success_bulk": "Bulk moderation action completed."
+  },
+  "admin_sources": {
+    "title": "Ingestion Sources",
+    "back": "Back to Admin",
+    "add_title": "Add Source",
+    "name": "Source name",
+    "type": "Source type",
+    "url": "Source URL",
+    "interval": "Interval (minutes)",
+    "add_button": "Add Source",
+    "sources_title": "Configured Sources",
+    "history_title": "Ingestion Run History",
+    "started": "Started",
+    "source": "Source",
+    "status": "Status",
+    "counts": "Found / Created / Updated / Failed",
+    "active": "Active",
+    "paused": "Paused",
+    "pause": "Pause",
+    "activate": "Activate",
+    "run_now": "Run now",
+    "running": "Running...",
+    "refresh": "Refresh",
+    "manage_link": "Manage Ingestion Sources",
+    "load_error": "Failed to load ingestion data.",
+    "save_error": "Failed to save source.",
+    "run_error": "Failed to run source."
   }
 }

@@ -142,6 +142,35 @@ export interface AuditLogItem {
   created_at: string;
 }
 
+export type SourceType = 'rss' | 'json_api' | 'html_scraper';
+
+export interface SourceItem {
+  id: string;
+  name: string;
+  source_type: SourceType;
+  url: string;
+  config: Record<string, unknown>;
+  is_active: boolean;
+  fetch_interval_minutes: number;
+  last_run_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IngestionRunItem {
+  id: string;
+  source_id: string;
+  source_name?: string | null;
+  status: 'running' | 'success' | 'partial_failure' | 'failed';
+  items_found: number;
+  items_created: number;
+  items_updated: number;
+  items_failed: number;
+  error_log?: string | null;
+  started_at: string;
+  finished_at?: string | null;
+}
+
 export interface HealthCheckResponse {
   status: 'ok' | 'degraded';
   db: 'connected' | 'disconnected';

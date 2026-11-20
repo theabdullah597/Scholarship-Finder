@@ -1,6 +1,14 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import admin, admin_opportunities, auth, health, opportunities, users
+from app.api.v1.endpoints import (
+    admin,
+    admin_opportunities,
+    admin_sources,
+    auth,
+    health,
+    opportunities,
+    users,
+)
 
 api_v1_router = APIRouter()
 
@@ -10,3 +18,4 @@ api_v1_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
 api_v1_router.include_router(opportunities.router)
 api_v1_router.include_router(admin_opportunities.router)
+api_v1_router.include_router(admin_sources.router)

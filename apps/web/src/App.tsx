@@ -14,6 +14,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Browse from './pages/Browse';
 import OpportunityDetail from './pages/OpportunityDetail';
 import AdminOpportunities from './pages/admin/Opportunities';
+import AdminSources from './pages/admin/Sources';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -210,6 +211,14 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminOpportunities />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sources"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminSources />
               </ProtectedRoute>
             }
           />

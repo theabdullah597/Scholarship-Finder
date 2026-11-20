@@ -7,13 +7,19 @@
 | Phase 0 | Foundations (Monorepo, Docker Compose, Postgres+pgvector, Redis, Mailpit, FastAPI Health, Tooling, CI) | done |
 | Phase 1 | Auth & Roles (Argon2id, JWT + rotating refresh cookie, RBAC, Student & Admin contexts) | done |
 | Phase 2 | Opportunities & Admin CRUD (Models, Keyset pagination, Filters, Audit logs, Browse & Admin UI) | done |
-| Phase 3 | Ingestion (Worker, RSS/JSON/HTML fetchers, Normalizer, Deduplication, Ingestion runs) | todo |
+| Phase 3 | Ingestion (Worker, RSS/JSON/HTML fetchers, Normalizer, Deduplication, Ingestion runs) | done |
 | Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | todo |
 | Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | todo |
 | Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | todo |
 | Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | todo |
 
 ## Last Completed
+- **Phase 3 Ingestion**:
+  - **Pipeline**: Added RSS/Atom, configurable JSON API, and CSS-selector HTML fetchers; sanitized and normalized untrusted text, URLs, country codes, opportunity kinds, funding types, deadlines, and stipend values.
+  - **Reliability**: Added per-source `ingestion_runs` tracking, per-item failure isolation, partial-failure status, bounded error logs, and a polling worker scheduler that runs active sources when their configured interval is due.
+  - **Deduplication**: Canonical URL matching runs first, followed by fuzzy title and organization matching; reruns update existing opportunities instead of creating duplicates.
+  - **Admin operations**: Added source CRUD, activation controls, synchronous run-now trigger, ingestion history, and audit records. Added the admin Sources page and shared API contracts.
+  - **Tests and validation**: 24 backend tests pass, including five ingestion acceptance tests; Ruff and mypy pass; frontend lint, strict typecheck, nine Vitest tests, and production build pass.
 - **Phase 2 Opportunities & Admin CRUD**:
   - **Database schema & migration**: `sources`, `opportunities`, `tags`, `opportunity_tags`, and `audit_logs` created with comprehensive btree, unique, and compound indexes (`ix_opportunities_status_deadline`, `ix_opportunities_status_created_at`, `ix_opportunities_canonical_url`).
   - **Public Endpoints**:
@@ -92,4 +98,4 @@
 - **React `act()` warnings** in test stderr — cosmetic noise from async state updates in AuthProvider, does not affect test correctness. Standard React 18 behavior.
 
 ## Next Step
-- **Phase 3: Ingestion** — Worker daemon and scheduler; fetchers for RSS, JSON API, and HTML; normalizer; deduplication engine (canonical URL first, then fuzzy title plus organization); `ingestion_runs` table and tracking; admin source management UI, run-now trigger, and ingestion run history viewer.
+- **Phase 4: AI Search** — LLM provider interface and fake provider, embeddings, hybrid retrieval, validated reranking, fallback search, Redis caching/rate limits, and the search UI.

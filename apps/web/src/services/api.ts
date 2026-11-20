@@ -1,12 +1,15 @@
 import {
   AuditLogItem,
   BulkModeratePayload,
+  IngestionRunItem,
   KeysetPaginationResponse,
   OpportunityCreatePayload,
   OpportunityFilterParams,
   OpportunityItem,
   OpportunityPatchPayload,
   StudentProfileData,
+  SourceItem,
+  SourceType,
   UserData,
 } from '@opportunity-abroad/shared';
 
@@ -300,6 +303,54 @@ export const api = {
       const data = await res.json();
       if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch audit logs', data);
       return data;
+    },
+
+    sources: {
+      list: async (): Promise<SourceItem[]> => {
+        const res = await fetchWithAuth('/admin/sources');
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch sources', data);
+        return data;
+      },
+      create: async (payload: {
+        name: string;
+        source_type: SourceType;
+        url: string;
+        config?: Record<string, unknown>;
+        is_active?: boolean;
+        fetch_interval_minutes?: number;
+      }): Promise<SourceItem> => {
+        const res = await fetchWithAuth('/admin/sources', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to create source', data);
+        return data;
+      },
+      update: async (id: string, payload: Partial<SourceItem>): Promise<SourceItem> => {
+        const res = await fetchWithAuth(`/admin/sources/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to update source', data);
+        return data;
+      },
+      runNow: async (id: string): Promise<IngestionRunItem> => {
+        const res = await fetchWithAuth(`/admin/sources/${id}/run-now`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to run source', data);
+        return data;
+      },
+      runs: async (sourceId?: string, limit = 50): Promise<IngestionRunItem[]> => {
+        const query = new URLSearchParams({ limit: String(limit) });
+        if (sourceId) query.set('source_id', sourceId);
+        const res = await fetchWithAuth(`/admin/ingestion-runs?${query.toString()}`);
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to fetch ingestion runs', data);
+        return data;
+      },
     },
   },
 };

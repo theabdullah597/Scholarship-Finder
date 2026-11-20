@@ -75,3 +75,11 @@
 - **Why**:
   - Allows unit and integration tests to run with high speed and zero external service overhead on in-memory SQLite (`aiosqlite`).
   - Production deployments use full native PostgreSQL capabilities (JSONB binary indexing and native arrays).
+
+## ADR-011: Ingestion Failure Isolation and Scheduling
+- **Date**: 2026-11-20
+- **Decision**: Execute ingestion on a per-source polling scheduler, record every run in `ingestion_runs`, and isolate malformed items from the rest of a source run. Fetchers preserve malformed records as invalid raw items so the engine can count and report them rather than silently dropping them.
+- **Why**:
+  - A source outage or malformed record must not stop other scheduled sources or valid records from being processed.
+  - Explicit failure counts and partial-failure statuses give administrators actionable run history while keeping the worker alive.
+  - Polling the configured `fetch_interval_minutes` keeps scheduling simple and avoids adding a second queue dependency before it is needed.

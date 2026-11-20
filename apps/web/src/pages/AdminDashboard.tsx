@@ -50,6 +50,12 @@ export const AdminDashboard: React.FC = () => {
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Student View</span>
             </a>
+            <a
+              href="/admin/sources"
+              className="inline-flex items-center px-4 py-2.5 rounded-xl border border-amber-500 text-amber-400 font-bold text-sm hover:bg-amber-500/10 transition"
+            >
+              <span>{t('admin_sources.manage_link')}</span>
+            </a>
             <button
               onClick={() => logout()}
               className="inline-flex items-center space-x-1.5 rtl:space-x-reverse text-sm font-medium text-slate-400 hover:text-red-400 transition"
