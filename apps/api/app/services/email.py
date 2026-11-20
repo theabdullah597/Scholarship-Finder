@@ -66,3 +66,18 @@ async def send_password_reset_email(to_email: str, token: str) -> None:
     </html>
     """
     await send_email(to_email, subject, html_content, text_content)
+
+
+async def send_deadline_reminder_email(to_email: str, opportunity_title: str, days_remaining: int) -> None:
+    """Send a minimal reminder without logging or embedding personal data."""
+    subject = f"OpportunityAbroad: {days_remaining}-day deadline reminder"
+    text_content = (
+        f"Your saved opportunity '{opportunity_title}' has an application deadline in "
+        f"{days_remaining} days. Please review your application."
+    )
+    html_content = (
+        "<html><body><p>Deadline reminder</p>"
+        f"<p><strong>{opportunity_title}</strong> has an application deadline in "
+        f"{days_remaining} days.</p></body></html>"
+    )
+    await send_email(to_email, subject, html_content, text_content)

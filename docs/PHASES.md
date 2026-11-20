@@ -16,7 +16,7 @@
 - **Acceptance Criteria**: Filters combine correctly, cursors stay stable, students see only published items.
 
 ## Phase 3: Ingestion
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement ingestion worker and scheduler; fetchers for RSS, JSON API, and HTML; normalizer; deduplication (canonical URL first, then fuzzy title + organization); `ingestion_runs`; admin source management, run-now trigger, run history, and moderation queue.
 - **Acceptance Criteria**: Three sources ingest on schedule, reruns create no duplicates, failures are counted and do not crash/stop a run.
 
@@ -26,7 +26,7 @@
 - **Acceptance Criteria**: Works with and without the provider; cached responses under 300 ms; no result references a missing opportunity.
 
 ## Phase 5: Student Dashboard
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement models and endpoints for `applications`, `notes`, `notifications`; save opportunities, track application status, add notes; daily deadline reminder background job at 14, 7, and 1 days before deadlines (no duplicates, user time zone); frontend notification bell; user data export and account self-deletion.
 - **Acceptance Criteria**: Reminders arrive in Mailpit; users cannot see or modify other users' private data.
 

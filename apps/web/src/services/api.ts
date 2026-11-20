@@ -1,5 +1,6 @@
 import {
   AuditLogItem,
+  ApplicationItem,
   BulkModeratePayload,
   IngestionRunItem,
   KeysetPaginationResponse,
@@ -11,6 +12,8 @@ import {
   SourceItem,
   SourceType,
   SearchResponse,
+  NoteItem,
+  NotificationItem,
   UserData,
 } from '@opportunity-abroad/shared';
 
@@ -195,6 +198,19 @@ export const api = {
       if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to update user', data);
       return data;
     },
+    exportData: async (): Promise<Record<string, unknown>> => {
+      const res = await fetchWithAuth('/users/me/export');
+      const data = await res.json();
+      if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to export data', data);
+      return data;
+    },
+    deleteAccount: async (): Promise<void> => {
+      const res = await fetchWithAuth('/users/me', { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new ApiError(res.status, data.detail || 'Failed to delete account', data);
+      }
+    },
   },
 
   opportunities: {
@@ -236,6 +252,70 @@ export const api = {
     const data = await res.json();
     if (!res.ok) throw new ApiError(res.status, data.detail || 'Search failed', data);
     return data;
+  },
+
+  student: {
+    applications: {
+      list: async (): Promise<ApplicationItem[]> => {
+        const res = await fetchWithAuth('/student/applications');
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to load applications', data);
+        return data;
+      },
+      save: async (opportunityId: string): Promise<ApplicationItem> => {
+        const res = await fetchWithAuth('/student/applications', {
+          method: 'POST',
+          body: JSON.stringify({ opportunity_id: opportunityId }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to save opportunity', data);
+        return data;
+      },
+      update: async (id: string, status: ApplicationItem['status']): Promise<ApplicationItem> => {
+        const res = await fetchWithAuth(`/student/applications/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to update application', data);
+        return data;
+      },
+      remove: async (id: string): Promise<void> => {
+        const res = await fetchWithAuth(`/student/applications/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new ApiError(res.status, 'Failed to remove saved opportunity');
+      },
+    },
+    notes: {
+      list: async (): Promise<NoteItem[]> => {
+        const res = await fetchWithAuth('/student/notes');
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to load notes', data);
+        return data;
+      },
+      create: async (opportunityId: string, content: string): Promise<NoteItem> => {
+        const res = await fetchWithAuth('/student/notes', {
+          method: 'POST',
+          body: JSON.stringify({ opportunity_id: opportunityId, content }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to save note', data);
+        return data;
+      },
+    },
+    notifications: {
+      list: async (unreadOnly = false): Promise<NotificationItem[]> => {
+        const res = await fetchWithAuth(`/student/notifications?unread_only=${unreadOnly}`);
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to load notifications', data);
+        return data;
+      },
+      markRead: async (id: string): Promise<NotificationItem> => {
+        const res = await fetchWithAuth(`/student/notifications/${id}/read`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new ApiError(res.status, data.detail || 'Failed to mark notification read', data);
+        return data;
+      },
+    },
   },
 
   admin: {

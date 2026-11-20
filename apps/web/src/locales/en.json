@@ -100,12 +100,38 @@
     "fields_of_interest": "Fields of Interest (comma separated, e.g., AI, Biotechnology)",
     "degree_level": "Target Degree Level",
     "timezone": "Timezone",
+    "notifications_title": "Notifications",
+    "no_notifications": "No notifications yet.",
+    "applications_title": "Saved & tracked opportunities",
+    "no_applications": "You have not saved any opportunities yet.",
+    "application_status": "Application status",
+    "add_note": "Add note",
+    "note_placeholder": "Add a private note...",
+    "student_data_error": "Could not load your saved data.",
+    "application_error": "Could not update the application.",
+    "note_error": "Could not save the note.",
+    "privacy_tools": "Your data belongs to you.",
+    "export_data": "Export my data",
+    "export_success": "Your data export is ready.",
+    "export_error": "Could not export your data.",
+    "delete_account": "Delete account",
+    "delete_confirm": "Delete your account and personal data? This cannot be undone.",
+    "delete_error": "Could not delete your account.",
     "degree_levels": {
       "bachelors": "Bachelor's Degree",
       "masters": "Master's Degree",
       "phd": "PhD / Doctorate",
       "postdoc": "Postdoctoral Research"
     }
+  },
+  "application_status": {
+    "saved": "Saved",
+    "in_progress": "In progress",
+    "submitted": "Submitted",
+    "interviewing": "Interviewing",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "withdrawn": "Withdrawn"
   },
   "admin": {
     "title": "Administrator Control Center",
@@ -187,6 +213,9 @@
     "fields_title": "Eligible Disciplines & Study Fields",
     "tags_title": "Categories & Badges",
     "description_title": "Detailed Program Overview",
+    "save_button": "Save opportunity",
+    "saved_button": "Saved",
+    "save_error": "Could not save this opportunity.",
     "apply_button": "Apply on Official Portal",
     "canonical_source": "Source Verification URL",
     "not_specified": "Not specified"

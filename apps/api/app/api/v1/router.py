@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     health,
     opportunities,
     search,
+    student,
     users,
 )
 
@@ -19,5 +20,6 @@ api_v1_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
 api_v1_router.include_router(opportunities.router)
 api_v1_router.include_router(search.router)
+api_v1_router.include_router(student.router)
 api_v1_router.include_router(admin_opportunities.router)
 api_v1_router.include_router(admin_sources.router)

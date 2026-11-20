@@ -15,6 +15,32 @@ export type ApplicationStatus =
   | 'rejected'
   | 'withdrawn';
 
+export interface ApplicationItem {
+  id: string;
+  opportunity: OpportunityItem;
+  status: ApplicationStatus;
+  applied_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NoteItem {
+  id: string;
+  opportunity_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  kind: string;
+  title: string;
+  message: string;
+  read_at?: string | null;
+  created_at: string;
+}
+
 export interface StudentProfileData {
   id: string;
   full_name?: string | null;

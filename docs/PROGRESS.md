@@ -9,11 +9,17 @@
 | Phase 2 | Opportunities & Admin CRUD (Models, Keyset pagination, Filters, Audit logs, Browse & Admin UI) | done |
 | Phase 3 | Ingestion (Worker, RSS/JSON/HTML fetchers, Normalizer, Deduplication, Ingestion runs) | done |
 | Phase 4 | AI Search (LLMProvider, Embeddings, Hybrid retrieval, Rerank, Redis cache, Fallback, UI) | done |
-| Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | todo |
+| Phase 5 | Student Dashboard (Saved, Applications, Notes, Deadline reminders, Data export/delete) | done |
 | Phase 6 | Admin Dashboard (User management, Analytics, Broadcasts, Audit log viewer) | todo |
 | Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | todo |
 
 ## Last Completed
+- **Phase 5 Student Dashboard**:
+  - **Student data**: Added applications, notes, and notifications tables with ownership constraints and migration. Students can save published opportunities, track application status, create private notes, and mark notifications read.
+  - **Reminders**: Added a daily worker job for 14-, 7-, and 1-day deadline reminders using each profile timezone, unique dedupe keys, notification records, and Mailpit email delivery.
+  - **Privacy**: Added user-scoped data export and soft account deletion with immediate refresh-token revocation. Cross-user application and note access is rejected.
+  - **Frontend**: Extended the student dashboard with saved application tracking, private notes, notification display, export/delete controls, and save-from-opportunity-detail.
+  - **Tests and validation**: 28 backend tests pass, including privacy isolation and reminder deduplication; Ruff, mypy, frontend lint, strict typecheck, nine Vitest tests, and production build pass.
 - **Phase 4 AI Search**:
   - **Grounded retrieval**: Added a provider interface, deterministic `FakeProvider`, optional OpenAI-compatible adapter, query embeddings, 0.6 semantic + 0.4 lexical scoring, top-50 candidate retrieval, and validated reranking.
   - **Safety and resilience**: Search is restricted to published database opportunities; unknown provider IDs are discarded, scores are clamped, reasons are markup-stripped, fallback ranking works without AI, and a three-failure circuit breaker prevents repeated provider calls.
@@ -104,4 +110,4 @@
 - **React `act()` warnings** in test stderr — cosmetic noise from async state updates in AuthProvider, does not affect test correctness. Standard React 18 behavior.
 
 ## Next Step
-- **Phase 5: Student Dashboard** — Saved opportunities, applications, notes, deadline reminders, notifications, and privacy export/delete workflows.
+- **Phase 6: Admin Dashboard** — User management, analytics, broadcast notifications, audit log viewer, and masked email privacy controls.

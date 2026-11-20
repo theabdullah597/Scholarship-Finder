@@ -13,14 +13,17 @@ import {
 } from 'lucide-react';
 import { OpportunityItem } from '@opportunity-abroad/shared';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export const OpportunityDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
   const [opp, setOpp] = useState<OpportunityItem | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -40,6 +43,16 @@ export const OpportunityDetail: React.FC = () => {
 
     fetchDetail();
   }, [id]);
+
+  const saveOpportunity = async () => {
+    if (!id) return;
+    try {
+      await api.student.applications.save(id);
+      setSaved(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('detail.save_error'));
+    }
+  };
 
   if (loading) {
     return (
@@ -208,6 +221,16 @@ export const OpportunityDetail: React.FC = () => {
 
           {/* Action Button */}
           <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => void saveOpportunity()}
+                disabled={saved}
+                className="w-full sm:w-auto rounded-xl border border-brand-200 px-6 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50 disabled:opacity-60"
+              >
+                {saved ? t('detail.saved_button') : t('detail.save_button')}
+              </button>
+            )}
             <a
               href={opp.source_url}
               target="_blank"

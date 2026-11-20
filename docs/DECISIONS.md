@@ -91,3 +91,11 @@
   - Retrieval remains grounded in PostgreSQL and cannot expose hallucinated or unpublished opportunities.
   - Deterministic scoring provides useful behavior in tests, local development, provider outages, and missing API credentials.
   - Caching and rate limiting protect provider cost and latency without making Redis the source of truth.
+
+## ADR-013: Student Data Ownership and Deadline Reminders
+- **Date**: 2026-11-20
+- **Decision**: Store applications, notes, and notifications with explicit `user_id` ownership and enforce ownership in every student endpoint. Generate deadline reminders in the worker at 14, 7, and 1 local calendar days, using a unique `(application, milestone)` dedupe key and sending email only after the notification is committed.
+- **Why**:
+  - Server-side ownership predicates prevent students from reading or changing another student's private data.
+  - Calendar-day calculations respect each student's timezone instead of assuming UTC midnight.
+  - Database-backed dedupe makes retries safe and keeps notifications authoritative even if email delivery is unavailable.

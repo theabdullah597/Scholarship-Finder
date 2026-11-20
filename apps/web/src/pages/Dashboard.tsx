@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, LogOut, CheckCircle, User as UserIcon, Globe, BookOpen, Clock, Shield } from 'lucide-react';
+import { Bell, CheckCircle, Clock, Download, Globe, GraduationCap, BookOpen, LogOut, Shield, Trash2, User as UserIcon } from 'lucide-react';
+import { ApplicationItem, NotificationItem, NoteItem } from '@opportunity-abroad/shared';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 export const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -17,6 +19,77 @@ export const Dashboard: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [applications, setApplications] = useState<ApplicationItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notes, setNotes] = useState<NoteItem[]>([]);
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+  const [dataMessage, setDataMessage] = useState<string | null>(null);
+
+  const loadStudentData = useCallback(async () => {
+    try {
+      const [applicationData, notificationData, noteData] = await Promise.all([
+        api.student.applications.list(),
+        api.student.notifications.list(),
+        api.student.notes.list(),
+      ]);
+      setApplications(applicationData);
+      setNotifications(notificationData);
+      setNotes(noteData);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('dashboard.student_data_error'));
+    }
+  }, [t]);
+
+  useEffect(() => {
+    void loadStudentData();
+  }, [loadStudentData]);
+
+  const updateApplication = async (id: string, status: ApplicationItem['status']) => {
+    try {
+      const updated = await api.student.applications.update(id, status);
+      setApplications((current) => current.map((item) => item.id === id ? updated : item));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('dashboard.application_error'));
+    }
+  };
+
+  const saveNote = async (opportunityId: string) => {
+    const content = noteDrafts[opportunityId]?.trim();
+    if (!content) return;
+    try {
+      const note = await api.student.notes.create(opportunityId, content);
+      setNotes((current) => [note, ...current]);
+      setNoteDrafts((current) => ({ ...current, [opportunityId]: '' }));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('dashboard.note_error'));
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      const data = await api.users.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'opportunityabroad-data.json';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setDataMessage(t('dashboard.export_success'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('dashboard.export_error'));
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (!window.confirm(t('dashboard.delete_confirm'))) return;
+    try {
+      await api.users.deleteAccount();
+      await logout();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('dashboard.delete_error'));
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +186,53 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Profile Form */}
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                <Bell className="h-5 w-5 text-brand-600" aria-hidden="true" />
+                {t('dashboard.notifications_title')}
+                {notifications.some((item) => !item.read_at) && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700">{notifications.filter((item) => !item.read_at).length}</span>}
+              </h2>
+              <div className="space-y-3">
+                {notifications.slice(0, 5).map((notification) => (
+                  <button
+                    type="button"
+                    key={notification.id}
+                    onClick={() => api.student.notifications.markRead(notification.id).then(() => setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item)))}
+                    className={`w-full rounded-lg border p-3 text-start text-sm ${notification.read_at ? 'border-slate-100 bg-slate-50' : 'border-brand-200 bg-brand-50'}`}
+                  >
+                    <span className="font-semibold text-slate-900">{notification.title}</span>
+                    <span className="mt-1 block text-slate-600">{notification.message}</span>
+                  </button>
+                ))}
+                {notifications.length === 0 && <p className="text-sm text-slate-500">{t('dashboard.no_notifications')}</p>}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-lg font-bold text-slate-900">{t('dashboard.applications_title')}</h2>
+              <div className="space-y-3">
+                {applications.map((application) => (
+                  <div key={application.id} className="rounded-lg border border-slate-100 p-3">
+                    <a href={`/opportunities/${application.opportunity.id}`} className="font-semibold text-slate-900 hover:text-brand-600">{application.opportunity.title}</a>
+                    <select aria-label={t('dashboard.application_status')} value={application.status} onChange={(event) => void updateApplication(application.id, event.target.value as ApplicationItem['status'])} className="mt-2 w-full rounded border border-slate-300 px-2 py-1 text-sm">
+                      {['saved', 'in_progress', 'submitted', 'interviewing', 'accepted', 'rejected', 'withdrawn'].map((value) => <option key={value} value={value}>{t(`application_status.${value}` as never)}</option>)}
+                    </select>
+                    <textarea aria-label={t('dashboard.note_placeholder')} value={noteDrafts[application.opportunity.id] || ''} onChange={(event) => setNoteDrafts((current) => ({ ...current, [application.opportunity.id]: event.target.value }))} placeholder={t('dashboard.note_placeholder')} className="mt-2 w-full rounded border border-slate-300 px-2 py-1 text-sm" rows={2} />
+                    {notes.filter((note) => note.opportunity_id === application.opportunity.id).map((note) => <p key={note.id} className="mt-2 rounded bg-slate-50 p-2 text-xs text-slate-600">{note.content}</p>)}
+                    <button type="button" onClick={() => void saveNote(application.opportunity.id)} className="mt-2 text-xs font-semibold text-brand-600">{t('dashboard.add_note')}</button>
+                  </div>
+                ))}
+                {applications.length === 0 && <p className="text-sm text-slate-500">{t('dashboard.no_applications')}</p>}
+              </div>
+            </div>
+          </section>
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <span className="text-sm text-slate-600">{dataMessage || t('dashboard.privacy_tools')}</span>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => void exportData()} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"><Download className="h-4 w-4" aria-hidden="true" />{t('dashboard.export_data')}</button>
+              <button type="button" onClick={() => void deleteAccount()} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"><Trash2 className="h-4 w-4" aria-hidden="true" />{t('dashboard.delete_account')}</button>
+            </div>
+          </section>
           <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
             <div className="border-b border-slate-200 pb-4 mb-6">
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
