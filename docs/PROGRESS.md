@@ -14,12 +14,11 @@
 | Phase 7 | Hardening & Launch (Security headers, Rate limits, i18n RTL, k6 load test, K8s, Runbooks) | done |
 
 ## Last Completed
-- **Live Opportunity Discovery Bootstrap**:
-  - Replaced placeholder ingestion source URLs with verified public RSS sources for Erasmus Mundus, CERN programmes, and the Commonwealth Scholarship Commission.
-  - Docker startup now applies migrations and runs the opportunity seed script before serving the API.
-  - The seed script adds published demo opportunities and attempts scheduled-source ingestion immediately; generated records remain pending-review unless published through the existing admin moderation flow.
-  - Added published-opportunity discovery cards to the student dashboard.
-  - Ingestion and opportunity validation passed: 12 focused backend tests, plus frontend lint and strict typecheck.
+- **Live opportunity discovery**:
+  - Development startup seeds published opportunities when the opportunity table is empty, restoring browse/search data immediately after a fresh database setup.
+  - The student dashboard now loads personalized published opportunities from the database using the student's target country and first field of interest.
+  - Seeded ingestion sources include official UW-Madison, Arizona State University, and Fulbright listing pages for worker HTML ingestion.
+  - AI search remains grounded: live or seeded opportunities are stored and moderated in PostgreSQL before they can be ranked or returned.
 - **Phase 7 Hardening & Launch**:
   - **API security**: Added strict CORS methods/headers, security headers, request IDs, structured JSON logs without request PII, production secret validation, SameSite=Strict refresh cookies, and Redis-backed fixed-window throttling for authentication routes.
   - **Frontend and accessibility**: Added Arabic locale support with automatic RTL document direction, a language switcher, strict Nginx security headers, and an axe Playwright smoke check.

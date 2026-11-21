@@ -116,10 +116,10 @@
   - RTL support and axe checks make accessibility part of the release path instead of a post-launch retrofit.
   - Explicit risk tracking prevents a forced dependency upgrade from silently breaking the tested frontend while retaining audit visibility.
 
-## ADR-016: Live Opportunity Data Bootstrap
-- **Date**: 2026-11-20
-- **Decision**: Configure real public RSS sources for Erasmus Mundus, CERN, and Commonwealth opportunities, seed published demonstration listings for immediate use, and run migrations plus the seed/ingestion bootstrap when the API container starts. Online-ingested records follow the existing pending-review moderation status; seed listings may be published immediately.
+## ADR-016: Live Discovery and Database Grounding
+- **Date**: 2026-11-21
+- **Decision**: Online listings are discovered by active ingestion sources and stored only in PostgreSQL. Development startup seeds a fresh database with published sample opportunities for immediate usability. The student dashboard provides database-backed personalized recommendations from profile country and field filters.
 - **Why**:
-  - Registration and authentication had worked even though the opportunity database was empty or populated only after a separate manual seed command.
-  - A container startup bootstrap prevents a fresh deployment from presenting an empty scholarship catalogue.
-  - Retaining pending-review status for scraped records preserves the moderation and source-grounding safeguards established in earlier phases.
+  - Keeping PostgreSQL authoritative prevents the AI or frontend from inventing or directly displaying unverified external listings.
+  - Worker ingestion and moderation allow official university/platform pages to refresh the catalog over time.
+  - Startup seeding removes the empty-catalog experience after a clean local database setup while production remains free of implicit demo data.

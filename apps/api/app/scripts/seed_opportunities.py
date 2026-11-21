@@ -16,41 +16,46 @@ from app.models.opportunity import (
     Source,
     Tag,
 )
-from app.services.ingestion.engine import IngestionEngine
 
 SAMPLE_SOURCES: list[dict[str, Any]] = [
     {
-        "name": "Erasmus Mundus Catalogue",
-        "source_type": "rss",
-        "url": "https://www.eacea.ec.europa.eu/node/253/rss_en",
+        "name": "UW-Madison International Scholarships",
+        "source_type": "html_scraper",
+        "url": "https://admissions.wisc.edu/international-scholarships/",
         "config": {
-            "default_organization": "European Education and Culture Executive Agency",
-            "default_country": "BE",
-            "headers": {},
+            "card_selector": "main article, main .accordion-item, main .card",
+            "title_selector": "h2, h3, .title, a",
+            "link_selector": "a",
+            "desc_selector": "p, .description, .summary",
+            "default_country": "US",
         },
         "is_active": True,
         "fetch_interval_minutes": 720,
     },
     {
-        "name": "CERN Student and Career Programmes",
-        "source_type": "rss",
-        "url": "https://careers.cern/programmes/feed/",
+        "name": "Arizona State University National Scholarships",
+        "source_type": "html_scraper",
+        "url": "https://onsa.asu.edu/scholarships",
         "config": {
-            "default_organization": "CERN",
-            "default_country": "CH",
-            "headers": {},
+            "card_selector": "main table tbody tr",
+            "title_selector": "h2, h3, .title, a",
+            "link_selector": "a",
+            "desc_selector": "td",
+            "default_country": "US",
         },
         "is_active": True,
         "fetch_interval_minutes": 720,
     },
     {
-        "name": "Commonwealth Scholarship Commission",
-        "source_type": "rss",
-        "url": "https://cscuk.fcdo.gov.uk/feed/",
+        "name": "Fulbright Foreign Student Program",
+        "source_type": "html_scraper",
+        "url": "https://foreign.fulbrightonline.org/",
         "config": {
-            "default_organization": "Commonwealth Scholarship Commission",
-            "default_country": "GB",
-            "headers": {},
+            "card_selector": "article, .opportunity-card, .scholarship-item, .listing-card",
+            "title_selector": "h2, h3, .title, a",
+            "link_selector": "a",
+            "desc_selector": "p, .description, .summary",
+            "default_country": "US",
         },
         "is_active": True,
         "fetch_interval_minutes": 720,
@@ -601,6 +606,11 @@ async def seed_data() -> None:
                 sources_map[src.name] = src
                 print(f"  + Added source: {src.name}")
             else:
+                existing_src.source_type = src_data["source_type"]
+                existing_src.url = src_data["url"]
+                existing_src.config = src_data.get("config", {})
+                existing_src.is_active = src_data.get("is_active", True)
+                existing_src.fetch_interval_minutes = src_data.get("fetch_interval_minutes", 720)
                 sources_map[existing_src.name] = existing_src
 
         print("🌱 Seeding tags...")
@@ -636,17 +646,6 @@ async def seed_data() -> None:
 
         await session.commit()
         print(f"✨ Successfully seeded {created_count} new opportunities! (Total: {len(SAMPLE_OPPORTUNITIES)})")
-
-        print("🌐 Running configured online sources...")
-        for source in sources_map.values():
-            try:
-                run = await IngestionEngine.run_ingestion_for_source(session, source)
-                print(
-                    f"  {source.name}: {run.status} "
-                    f"(found={run.items_found}, created={run.items_created}, failed={run.items_failed})"
-                )
-            except Exception as exc:
-                print(f"  {source.name}: ingestion unavailable ({type(exc).__name__})")
 
 
 def main() -> None:

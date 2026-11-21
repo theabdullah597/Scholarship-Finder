@@ -24,24 +24,32 @@ export const Dashboard: React.FC = () => {
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [dataMessage, setDataMessage] = useState<string | null>(null);
-  const [opportunities, setOpportunities] = useState<OpportunityItem[]>([]);
+  const [recommendations, setRecommendations] = useState<OpportunityItem[]>([]);
 
   const loadStudentData = useCallback(async () => {
     try {
-      const [applicationData, notificationData, noteData, opportunityData] = await Promise.all([
+      const [applicationData, notificationData, noteData] = await Promise.all([
         api.student.applications.list(),
         api.student.notifications.list(),
         api.student.notes.list(),
-        api.opportunities.list({ limit: 6, include_expired: false }),
       ]);
+      const country = user?.profile?.target_countries?.[0];
+      const field = user?.profile?.fields_of_interest?.[0];
+      const recommendationData = await api.opportunities.list({
+        country,
+        field,
+        include_expired: false,
+        sort: 'deadline_asc',
+        limit: 6,
+      });
       setApplications(applicationData);
       setNotifications(notificationData);
       setNotes(noteData);
-      setOpportunities(opportunityData.items);
+      setRecommendations(recommendationData.items);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('dashboard.student_data_error'));
     }
-  }, [t]);
+  }, [t, user]);
 
   useEffect(() => {
     void loadStudentData();
@@ -189,26 +197,35 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">{t('dashboard.discover_title')}</h2>
-                <p className="mt-1 text-sm text-slate-500">{t('dashboard.discover_subtitle')}</p>
-              </div>
-              <a href="/opportunities" className="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
-                {t('dashboard.discover_all')}
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+                <GraduationCap className="h-5 w-5 text-brand-600" aria-hidden="true" />
+                {t('dashboard.recommendations_title')}
+              </h2>
+              <a href="/opportunities" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+                {t('dashboard.browse_all')}
               </a>
             </div>
-            {opportunities.length > 0 ? (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {opportunities.slice(0, 4).map((opportunity) => (
-                  <a key={opportunity.id} href={`/opportunities/${opportunity.id}`} className="rounded-xl border border-slate-200 p-4 hover:border-brand-300 hover:bg-brand-50/30">
+            {recommendations.length > 0 ? (
+              <div className="grid gap-3 md:grid-cols-2">
+                {recommendations.map((opportunity) => (
+                  <a
+                    key={opportunity.id}
+                    href={`/opportunities/${opportunity.id}`}
+                    className="rounded-xl border border-slate-200 p-4 transition hover:border-brand-300 hover:bg-brand-50/40"
+                  >
                     <p className="font-semibold text-slate-900">{opportunity.title}</p>
-                    <p className="mt-1 text-xs text-slate-500">{opportunity.organization} · {opportunity.country}</p>
+                    <p className="mt-1 text-sm text-slate-600">{opportunity.organization} · {opportunity.country}</p>
+                    {opportunity.deadline && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        {t('dashboard.deadline')}: {new Date(opportunity.deadline).toLocaleDateString()}
+                      </p>
+                    )}
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">{t('dashboard.no_published_opportunities')}</p>
+              <p className="text-sm text-slate-500">{t('dashboard.no_recommendations')}</p>
             )}
           </section>
 

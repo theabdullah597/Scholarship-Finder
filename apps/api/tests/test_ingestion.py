@@ -12,6 +12,7 @@ from app.core.security import create_access_token, hash_password
 from app.models.ingestion import IngestionRun, IngestionStatus
 from app.models.opportunity import Opportunity, Source
 from app.models.user import User, UserRole
+from app.scripts.seed_opportunities import SAMPLE_SOURCES
 from app.services.ingestion.engine import IngestionEngine
 from app.worker import run_due_sources
 
@@ -100,6 +101,14 @@ async def create_admin(db: AsyncSession) -> User:
     await db.commit()
     await db.refresh(user)
     return user
+
+
+def test_seed_catalog_contains_official_html_sources() -> None:
+    names = {source["name"] for source in SAMPLE_SOURCES}
+    assert "UW-Madison International Scholarships" in names
+    assert "Arizona State University National Scholarships" in names
+    assert all(source["source_type"] == "html_scraper" for source in SAMPLE_SOURCES)
+    assert all(source["is_active"] is True for source in SAMPLE_SOURCES)
 
 
 @pytest.mark.asyncio

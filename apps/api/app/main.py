@@ -38,6 +38,23 @@ logger = logging.getLogger("opportunityabroad.api")
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting OpportunityAbroad API (%s)...", settings.ENVIRONMENT)
+    if not settings.is_production:
+        try:
+            from sqlalchemy import func, select
+
+            from app.db.session import AsyncSessionLocal
+            from app.models.opportunity import Opportunity
+            from app.scripts.seed_opportunities import seed_data
+
+            async with AsyncSessionLocal() as session:
+                opportunity_count = (
+                    await session.execute(select(func.count(Opportunity.id)))
+                ).scalar_one()
+            if opportunity_count == 0:
+                await seed_data()
+                logger.info("Development database seeded with sample opportunities.")
+        except Exception as exc:
+            logger.warning("Development data seed skipped: %s", type(exc).__name__)
     yield
     logger.info("Shutting down OpportunityAbroad API...")
     await close_redis()
