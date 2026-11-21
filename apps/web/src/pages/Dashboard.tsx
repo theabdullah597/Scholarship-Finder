@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, CheckCircle, Clock, Download, Globe, GraduationCap, BookOpen, LogOut, Shield, Trash2, User as UserIcon } from 'lucide-react';
-import { ApplicationItem, NotificationItem, NoteItem } from '@opportunity-abroad/shared';
+import { ApplicationItem, NotificationItem, NoteItem, OpportunityItem } from '@opportunity-abroad/shared';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
@@ -24,17 +24,20 @@ export const Dashboard: React.FC = () => {
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [dataMessage, setDataMessage] = useState<string | null>(null);
+  const [opportunities, setOpportunities] = useState<OpportunityItem[]>([]);
 
   const loadStudentData = useCallback(async () => {
     try {
-      const [applicationData, notificationData, noteData] = await Promise.all([
+      const [applicationData, notificationData, noteData, opportunityData] = await Promise.all([
         api.student.applications.list(),
         api.student.notifications.list(),
         api.student.notes.list(),
+        api.opportunities.list({ limit: 6, include_expired: false }),
       ]);
       setApplications(applicationData);
       setNotifications(notificationData);
       setNotes(noteData);
+      setOpportunities(opportunityData.items);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('dashboard.student_data_error'));
     }
@@ -184,6 +187,30 @@ export const Dashboard: React.FC = () => {
               </span>
             </div>
           </div>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">{t('dashboard.discover_title')}</h2>
+                <p className="mt-1 text-sm text-slate-500">{t('dashboard.discover_subtitle')}</p>
+              </div>
+              <a href="/opportunities" className="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                {t('dashboard.discover_all')}
+              </a>
+            </div>
+            {opportunities.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {opportunities.slice(0, 4).map((opportunity) => (
+                  <a key={opportunity.id} href={`/opportunities/${opportunity.id}`} className="rounded-xl border border-slate-200 p-4 hover:border-brand-300 hover:bg-brand-50/30">
+                    <p className="font-semibold text-slate-900">{opportunity.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{opportunity.organization} · {opportunity.country}</p>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">{t('dashboard.no_published_opportunities')}</p>
+            )}
+          </section>
 
           {/* Profile Form */}
           <section className="grid gap-6 lg:grid-cols-2">

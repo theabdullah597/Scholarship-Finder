@@ -21,6 +21,10 @@
     "login_button": "تسجيل الدخول"
   },
   "dashboard": {
-    "title": "لوحة الطالب"
+    "title": "لوحة الطالب",
+    "discover_title": "اكتشف المنح",
+    "discover_subtitle": "تصفح المنح والابتعاثات والتدريبات والزمالات الحالية.",
+    "discover_all": "استكشف جميع الفرص",
+    "no_published_opportunities": "لا توجد فرص منشورة حتى الآن."
   }
 }

@@ -115,3 +115,11 @@
   - Headers, allow-lists, throttling, and request correlation reduce common web attack and incident-response risks without changing the domain model.
   - RTL support and axe checks make accessibility part of the release path instead of a post-launch retrofit.
   - Explicit risk tracking prevents a forced dependency upgrade from silently breaking the tested frontend while retaining audit visibility.
+
+## ADR-016: Live Opportunity Data Bootstrap
+- **Date**: 2026-11-20
+- **Decision**: Configure real public RSS sources for Erasmus Mundus, CERN, and Commonwealth opportunities, seed published demonstration listings for immediate use, and run migrations plus the seed/ingestion bootstrap when the API container starts. Online-ingested records follow the existing pending-review moderation status; seed listings may be published immediately.
+- **Why**:
+  - Registration and authentication had worked even though the opportunity database was empty or populated only after a separate manual seed command.
+  - A container startup bootstrap prevents a fresh deployment from presenting an empty scholarship catalogue.
+  - Retaining pending-review status for scraped records preserves the moderation and source-grounding safeguards established in earlier phases.

@@ -16,22 +16,44 @@ from app.models.opportunity import (
     Source,
     Tag,
 )
+from app.services.ingestion.engine import IngestionEngine
 
 SAMPLE_SOURCES: list[dict[str, Any]] = [
     {
-        "name": "DAAD German Academic Exchange Service",
-        "source_type": "json_api",
-        "url": "https://www2.daad.de/deutschland/stipendien/datenbank/en/21148-scholarship-database/",
-    },
-    {
-        "name": "Chevening UK Government Scholarships",
+        "name": "Erasmus Mundus Catalogue",
         "source_type": "rss",
-        "url": "https://www.chevening.org/scholarships/",
+        "url": "https://www.eacea.ec.europa.eu/node/253/rss_en",
+        "config": {
+            "default_organization": "European Education and Culture Executive Agency",
+            "default_country": "BE",
+            "headers": {},
+        },
+        "is_active": True,
+        "fetch_interval_minutes": 720,
     },
     {
-        "name": "Fulbright Foreign Student Program",
-        "source_type": "html_scraper",
-        "url": "https://foreign.fulbrightonline.org/",
+        "name": "CERN Student and Career Programmes",
+        "source_type": "rss",
+        "url": "https://careers.cern/programmes/feed/",
+        "config": {
+            "default_organization": "CERN",
+            "default_country": "CH",
+            "headers": {},
+        },
+        "is_active": True,
+        "fetch_interval_minutes": 720,
+    },
+    {
+        "name": "Commonwealth Scholarship Commission",
+        "source_type": "rss",
+        "url": "https://cscuk.fcdo.gov.uk/feed/",
+        "config": {
+            "default_organization": "Commonwealth Scholarship Commission",
+            "default_country": "GB",
+            "headers": {},
+        },
+        "is_active": True,
+        "fetch_interval_minutes": 720,
     },
 ]
 
@@ -614,6 +636,17 @@ async def seed_data() -> None:
 
         await session.commit()
         print(f"✨ Successfully seeded {created_count} new opportunities! (Total: {len(SAMPLE_OPPORTUNITIES)})")
+
+        print("🌐 Running configured online sources...")
+        for source in sources_map.values():
+            try:
+                run = await IngestionEngine.run_ingestion_for_source(session, source)
+                print(
+                    f"  {source.name}: {run.status} "
+                    f"(found={run.items_found}, created={run.items_created}, failed={run.items_failed})"
+                )
+            except Exception as exc:
+                print(f"  {source.name}: ingestion unavailable ({type(exc).__name__})")
 
 
 def main() -> None:
