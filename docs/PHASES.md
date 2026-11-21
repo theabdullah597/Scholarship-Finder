@@ -31,7 +31,7 @@
 - **Acceptance Criteria**: Reminders arrive in Mailpit; users cannot see or modify other users' private data.
 
 ## Phase 6: Admin Dashboard
-- **Status**: todo
+- **Status**: done
 - **Goal**: Implement admin user management (role assignment, suspend, restore), analytics overview page, broadcast notifications, audit log viewer, and masked email privacy controls.
 - **Acceptance Criteria**: Every admin action writes an `audit_logs` record; suspended users cannot log in or refresh tokens.
 
